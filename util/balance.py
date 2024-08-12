@@ -62,3 +62,4 @@ class Balance:
             Balance.con.commit()
             return count
 
+    

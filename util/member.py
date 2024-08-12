@@ -21,4 +21,13 @@ class Member:
 
     @staticmethod
     def getCountSecondVoice(server_id, user_id):
-        pass
+        Member.cur.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+        row = Member.cur.fetchone()
+        if row:
+            return row[3]
+        else: 
+            Member.cur.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
+                            (server_id, user_id, 0))
+            Member.con.commit()
+            return 0
+
