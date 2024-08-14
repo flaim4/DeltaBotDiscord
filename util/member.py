@@ -1,11 +1,10 @@
 import sqlite3
 import disnake
 
+from util.db import Data
+
 class Member:
-    con = sqlite3.connect("member.db")
-    cur = con.cursor()
-    cur.execute("""CREATE TABLE IF NOT EXISTS Users (server_id INTEGER, user_id INTEGER, message INTEGER DEFAULT 0, voice_activ INTEGER DEFAULT 0, warns INTEGER DEFAULT 0, lvl INTEGER DEFAULT 1, xp INTEGER DEFAULT 0)""")
-    con.commit()
+    cur = Data.getCur()
     
     @staticmethod
     def getCountMessage(server_id, user_id):
@@ -16,7 +15,20 @@ class Member:
         else: 
             Member.cur.execute("""INSERT INTO Users (server_id, user_id, message) VALUES (?, ?, ?)""",
                             (server_id, user_id, 0))
-            Member.con.commit()
+            Data.commit()
+            return 0
+
+
+    @staticmethod
+    def getWarns(server_id, user_id):
+        Member.cur.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+        row = Member.cur.fetchone()
+        if row:
+            return row[4]
+        else: 
+            Member.cur.execute("""INSERT INTO Users (server_id, user_id, warns) VALUES (?, ?, ?)""",
+                            (server_id, user_id, 0))
+            Data.commit()
             return 0
 
     @staticmethod
@@ -28,7 +40,7 @@ class Member:
         else: 
             Member.cur.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
                             (server_id, user_id, 0))
-            Member.con.commit()
+            Data.commit()
             return 0
         
     @staticmethod

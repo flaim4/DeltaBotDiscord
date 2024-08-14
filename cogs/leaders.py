@@ -4,22 +4,25 @@ from util.member import Member
 from disnake.ext import commands
 import settings
 
+from util.db import Data
+
 class Leaders(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.conn = sqlite3.connect('member.db')
-        self.cursor = self.conn.cursor()
+        self.cursor = Data.getCur()
         self.ProfileColor = settings.InvisibleColor
         
     @commands.slash_command()
     async def leaders(self, ctx):
-        self.cursor.execute("SELECT * FROM Users")
+        limit = 15 
+
+        self.cursor.execute(f"SELECT * FROM Users ORDER BY voice_activ DESC LIMIT {limit};")
+
         rows = self.cursor.fetchall()
 
-        rows.sort(key=lambda row: row[3], reverse=True)
 
         text = "### Лидеры по времени в голосовом канале\n"
-        limit = 15 
+    
 
         for index, row in enumerate(rows[:limit], start=1):
             voice_time = row[3]

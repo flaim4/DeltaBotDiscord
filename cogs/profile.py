@@ -8,32 +8,30 @@ from disnake import colour
 from util.member import Member
 from util.balance import Balance
 
+from util.db import Data
+
 class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(description="Отображает профиль пользователя.")
+    @commands.slash_command(description=Data.lang.get("profile.description"))
     async def profile(self, ctx, member: disnake.Member = None):
         
         if ctx.author.bot:
             return
         
-        # Если member не указан, установить его на ctx.author
         if member is None:
             member = ctx.author
 
-        # Проверка на то, является ли member ботом
         if member.bot:
-            await ctx.send("Я не могу посмотреть профиль бота.", ephemeral=True)
+            await ctx.send(Data.lang.get("profile.botr"), ephemeral=True)
             return
         
-        # Отображение профиля пользователя
         name=member.display_name
         server = ctx.guild
 
         voice_seconds = Member.getCountSecondVoice(member.guild.id, member.id)
-
-        # Обработка случая, если voice_seconds None или нулевой
+        
         if voice_seconds is None or voice_seconds == 0:
             days, hours, minutes, seconds = 0, 0, 0, 0
         else:
@@ -41,34 +39,22 @@ class Profile(commands.Cog):
 
         ProfileColor = settings.InvisibleColor
         ErrorColor = settings.ErrorColor
-        if server.icon is None:
+        
 
-            embed = disnake.Embed(description=f"> **Основная информация**\n```Имя пользователя: {name}\nО себе: Beta\nКлан: Beta```",colour=ProfileColor)
-
-            embed.set_author(name=f"{name} • Профиль", icon_url=member.avatar)
+        embed = disnake.Embed(description=f"> **Основная информация**\n```ansi\n[0m[2;37mИмя пользователя: {name}\nО себе: [2;32m[0m[2;31mBeta[0m[2;37m\nКлан: [2;32m[0m[2;31mBeta[0m[2;37m```", colour=ProfileColor)
             
-            embed.add_field(name="> Уровень", value="```yaml\n1```", inline=True)
-            embed.add_field(name="> Опыт", value="```yaml\n2```", inline=True)
-            embed.add_field(name="> Баланс", value=f"```yaml\n{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
-            embed.add_field(name="> Активность", value=f"```yaml\n{days}д {hours}ч {minutes}м {seconds}с```", inline=True)
-            embed.add_field(name="> Сообщения", value=f"```yaml\n{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
-            
-            await ctx.send(embed=embed)
-        else:
-            embed = disnake.Embed(description=f"> **Основная информация**\n```Имя пользователя: {name}\nО себе: Beta\nКлан: Beta```", colour=ProfileColor)
-            
-            embed.set_author(name=f"{name} • Профиль", icon_url=member.avatar)
+        embed.set_author(name=f"{name} • Профиль", icon_url=member.avatar)
     
-            embed.add_field(name="> Уровень", value="```yaml\n1```", inline=True)
-            embed.add_field(name="> Опыт", value="```yaml\n2```", inline=True)
-            embed.add_field(name="> Баланс", value=f"```yaml\n{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
-            embed.add_field(name="> Нарушения", value="```yaml\n4```", inline=True)
-            embed.add_field(name="> Активность", value=f"```yaml\n{int(days)}д {int(hours)}ч {int(minutes)}м```", inline=True)
-            embed.add_field(name="> Сообщения", value=f"```yaml\n{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
-            
-            await ctx.send(embed=embed) 
+        embed.add_field(name="> Уровень", value="```yaml\n1```", inline=True)
+        embed.add_field(name="> Опыт", value="```yaml\n2```", inline=True)
+        embed.add_field(name="> Баланс", value=f"```yaml\n{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
+        embed.add_field(name="> Нарушения", value=f"```yaml\n{Member.getWarns(member.guild.id, member.id)}```", inline=True)
+        embed.add_field(name="> Активность", value=f"```yaml\n{int(days)}д {int(hours)}ч {int(minutes)}м```", inline=True)
+        embed.add_field(name="> Сообщения", value=f"```yaml\n{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
+        
+        await ctx.send(embed=embed) 
 
-    @commands.slash_command(description="Посмотреть")
+    @commands.slash_command(description=Data.lang.get("balance.description"))
     @commands.default_member_permissions(administrator=True)
     async def balance(self, ctx):
         await ctx.send(Balance.getBalance(ctx.guild.id, ctx.author.id))
