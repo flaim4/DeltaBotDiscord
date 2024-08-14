@@ -30,4 +30,15 @@ class Member:
                             (server_id, user_id, 0))
             Member.con.commit()
             return 0
+        
+    @staticmethod
+    def convert_seconds(seconds):
+        days = seconds // 86400
+        seconds %= 86400
+        hours = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
+        
+        return days, hours, minutes, seconds
 

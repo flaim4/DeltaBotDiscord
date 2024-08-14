@@ -12,16 +12,6 @@ class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @staticmethod
-    def convert_seconds(seconds):
-        days = seconds // 86400
-        seconds %= 86400
-        hours = seconds // 3600
-        seconds %= 3600
-        minutes = seconds // 60
-        seconds %= 60
-        return days, hours, minutes, seconds
-
     @commands.slash_command(description="Отображает профиль пользователя.")
     async def profile(self, ctx, member: disnake.Member = None):
         
@@ -47,7 +37,7 @@ class Profile(commands.Cog):
         if voice_seconds is None or voice_seconds == 0:
             days, hours, minutes, seconds = 0, 0, 0, 0
         else:
-            days, hours, minutes, seconds = self.convert_seconds(voice_seconds)
+            days, hours, minutes, seconds = Member.convert_seconds(voice_seconds)
 
         ProfileColor = settings.InvisibleColor
         ErrorColor = settings.ErrorColor
@@ -62,8 +52,6 @@ class Profile(commands.Cog):
             embed.add_field(name="> Баланс", value=f"```yaml\n{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
             embed.add_field(name="> Активность", value=f"```yaml\n{days}д {hours}ч {minutes}м {seconds}с```", inline=True)
             embed.add_field(name="> Сообщения", value=f"```yaml\n{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
-
-            embed.set_footer(text=str(settings.MiniServerName))
             
             await ctx.send(embed=embed)
         else:
@@ -77,18 +65,8 @@ class Profile(commands.Cog):
             embed.add_field(name="> Нарушения", value="```yaml\n4```", inline=True)
             embed.add_field(name="> Активность", value=f"```yaml\n{int(days)}д {int(hours)}ч {int(minutes)}м```", inline=True)
             embed.add_field(name="> Сообщения", value=f"```yaml\n{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
-            embed.set_footer(text=str(settings.MiniServerName), icon_url=server.icon)
             
-            await ctx.send(embed=embed)
-
-    #@profile.error
-    #async def profile_error(self, ctx, error):
-    #    author = ctx.author
-    #    name = ctx.author.display_name
-    #    embed = disnake.Embed(description="Произошла ошибка попробуйте ещё раз.",
-    #                   colour=ErrorColor)
-    #    embed.set_author(name=f"{name} • Ошибка 404", icon_url=author.avatar)
-    #    await ctx.send(embed=embed, ephemeral=True)
+            await ctx.send(embed=embed) 
 
     @commands.slash_command(description="Посмотреть")
     @commands.default_member_permissions(administrator=True)
