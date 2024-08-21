@@ -4,6 +4,7 @@ from disnake import TextInputStyle
 import sqlite3
 import time
 import settings
+from datetime import datetime
 from disnake import colour
 from util.member import Member
 from util.balance import Balance
@@ -27,6 +28,11 @@ class Profile(commands.Cog):
             await ctx.send(Data.lang.get("profile.botr"), ephemeral=True)
             return
         
+        if (Member.getLoveMember(member.guild.id, member.id) is None):
+            components = [disnake.ui.Button(label="Открыть любовный профиль", style=disnake.ButtonStyle.blurple, custom_id="love", disabled=True)]
+        else:
+            components = [disnake.ui.Button(label="Открыть любовный профиль", style=disnake.ButtonStyle.blurple, custom_id="love", disabled=False)]
+
         name=member.display_name
         server = ctx.guild
 
@@ -40,19 +46,17 @@ class Profile(commands.Cog):
         ProfileColor = settings.InvisibleColor
         ErrorColor = settings.ErrorColor
         
-
-        embed = disnake.Embed(description=f"> **Основная информация**\n```ansi\n[0m[2;37mИмя пользователя: {name}\nО себе: [2;32m[0m[2;31mBeta[0m[2;37m\nКлан: [2;32m[0m[2;31mBeta[0m[2;37m```", colour=ProfileColor)
-            
-        embed.set_author(name=f"{name} • Профиль", icon_url=member.avatar)
-    
+        embed = disnake.Embed(description=f"### Профиль — {member.global_name}", colour=ProfileColor)
+        
         embed.add_field(name="> Уровень", value="```yaml\n1```", inline=True)
         embed.add_field(name="> Опыт", value="```yaml\n2```", inline=True)
         embed.add_field(name="> Баланс", value=f"```yaml\n{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
         embed.add_field(name="> Нарушения", value=f"```yaml\n{Member.getWarns(member.guild.id, member.id)}```", inline=True)
         embed.add_field(name="> Активность", value=f"```yaml\n{int(days)}д {int(hours)}ч {int(minutes)}м```", inline=True)
         embed.add_field(name="> Сообщения", value=f"```yaml\n{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
-        
-        await ctx.send(embed=embed) 
+        embed.set_thumbnail(url=member.avatar)
+        await ctx.send(embed=embed, components=components) 
+
 
     @commands.slash_command(description=Data.lang.get("balance.description"))
     @commands.default_member_permissions(administrator=True)
@@ -73,6 +77,31 @@ class Profile(commands.Cog):
     @commands.default_member_permissions(administrator=True)
     async def spendbalance(self, ctx, member: disnake.Member = None, count: int = 0):
         Balance.spendBalance(ctx.guild.id, member.id, count)
+
+
+    @commands.Cog.listener(disnake.Event.button_click)
+    async def button_click(self, inter: disnake.MessageInteraction):
+        if (inter.component.custom_id == "love"):
+            embed = disnake.Embed(description=f"### Любовный профиль — {inter.author.global_name}")
+            love_member = inter.guild.get_member(Member.getLoveMember(inter.guild.id, inter.author.id))
+            embed.add_field(name = "> Партнер", value = f"```{love_member.global_name}```", inline=False)
+            current_datetime = datetime.fromtimestamp(Member.getLoveMemberDataRegister(inter.guild.id, inter.user))
+            formatted_time = current_datetime.strftime('%Y-%m-%d')
+            embed.add_field(name = "> Регистрация", value = f"```{formatted_time}```", inline=True)
+
+            voice_seconds = time.time() - Member.getLoveMemberDataRegister(inter.guild.id, inter.user)
+        
+            if voice_seconds is None or voice_seconds == 0:
+                days, hours, minutes, seconds = 0, 0, 0, 0
+            else:
+                days, hours, minutes, seconds = Member.convert_seconds(voice_seconds)
+
+            embed.add_field(name = "> Всего вместе", value = f"```{int(days)}д {int(hours)}ч, {int(minutes)}м  ```", inline=True)
+            embed.add_field(name = "> Времени проведено в любовной комнате", value = f"```{Member.getLoveMemberTimeVoice(inter.guild.id, inter.user)}```", inline=False)
+            embed.set_thumbnail(url=inter.author.avatar.url)
+            ProfileColor = settings.InvisibleColor
+            embed.color = ProfileColor
+            await inter.send(embed=embed)
 
 def setup(bot):
     bot.add_cog(Profile(bot))

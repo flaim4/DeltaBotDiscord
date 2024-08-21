@@ -2,3 +2,7 @@ balance.db
 data.db
 member.db
 .env
+./__pycache__/
+./commands/
+./cogs/__pycache__/
+./util/__pycache__/

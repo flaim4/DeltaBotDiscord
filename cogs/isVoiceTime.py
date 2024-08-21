@@ -3,6 +3,7 @@ import sqlite3
 import asyncio
 import disnake 
 import time
+from util.member import Member
 
 from util.db import Data
 
@@ -12,6 +13,7 @@ class isVoiceTime(commands.Cog):
         self.bot = bot
         self.cur = Data.getCur()
         self.heshmap = {}
+        self.heshmapLove = {}
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
@@ -27,12 +29,14 @@ class isVoiceTime(commands.Cog):
             if before.channel is None and after.channel is not None:
                 cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
                 row = cur.fetchone()
+                
                 if row is None:
                     cur.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
                                 (server_id, member.id, 0))
                     Data.commit()
                     cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
                     row = cur.fetchone()
+
 
                 self.heshmap[member.id] = time.time()
 

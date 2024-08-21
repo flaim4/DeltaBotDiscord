@@ -14,6 +14,7 @@ class isMessage(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cur = Data.getCur()
+        
     @commands.Cog.listener()
     async def on_message(self, message):
         self.cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (message.guild.id, message.author.id))
