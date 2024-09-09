@@ -1,6 +1,7 @@
 import disnake
 from disnake.ext import commands
 from util.db import Data
+import time 
 
 from disnake import TextInputStyle
 
@@ -59,7 +60,9 @@ class VoiceMaster(commands.Cog):
                 self.heshmap[channel.id] = {
                     "channelId": channel.id,
                     "owner": member.id,
-                    "countMember": 1
+                    "countMember": 1,
+                    "timeOutName": 0,
+                    "timeOutLimit": 0
                 }
                 await member.move_to(channel=channel)
     
@@ -89,7 +92,9 @@ class VoiceMaster(commands.Cog):
                 self.heshmap[channel.id] = {
                     "channelId": channel.id,
                     "owner": member.id,
-                    "countMember": 1
+                    "countMember": 1,
+                    "timeOutName": 0,
+                    "timeOutLimit": 0
                 }
                 await member.move_to(channel=channel)
 
@@ -170,9 +175,8 @@ class VoiceMaster(commands.Cog):
                     embed = disnake.Embed(description="Вы успещно открыли канал.")
 
                 await inter.send(embed=embed, ephemeral=True)
-        else: 
-            embed = disnake.Embed(description="У тебя нету прав.")
-            await inter.send(embed=embed, ephemeral=True)
+        else:
+            await inter.send("Канал не найден.")
 
     @commands.slash_command(name="voice_view")
     async def view(self, inter: ApplicationCommandInteraction):
@@ -204,16 +208,24 @@ class VoiceMaster(commands.Cog):
     async def limit(self, inter: ApplicationCommandInteraction, limit: int):
         idChannel = inter.author.voice.channel.id
         channel: disnake.GuildChannel = inter.author.guild.get_channel(idChannel)
+        
         if idChannel in self.heshmap:
-            if (self.heshmap[idChannel]["owner"] == inter.author.id):
-                if (limit <= 99):
-                    await self.channel.edit(user_limit=limit)
-                    await inter.send(f"Вы успешно изменили лимит на {limit}")
-                else: 
-                    await inter.send(f"Вы не можете привышать лимит")
+            if self.heshmap[idChannel]["owner"] == inter.author.id:
+                if self.heshmap[idChannel]["timeOutLimit"] == 0 or self.heshmap[idChannel]["timeOutLimit"] < time.time():
+                    if limit <= 99:
+                        await channel.edit(user_limit=limit)
+                        await inter.send(f"Вы успешно изменили лимит на {limit}")
+                        self.heshmap[idChannel]["timeOutLimit"] = time.time() + 120
+                    else:
+                        await inter.send(f"Вы не можете превышать лимит")
+                else:
+                    remaining_time = int(self.heshmap[idChannel]["timeOutLimit"] - time.time())
+                    await inter.send(f"Вы не можете изменить лимит сейчас. Подождите {remaining_time} секунд.")
+            else:
+                await inter.send("У тебя нет прав для изменения лимита.")
         else:
-            embed = disnake.Embed(description="У тебя нету прав.")
-            await inter.send(embed=embed, ephemeral=True)
+            await inter.send("Канал не найден.")
+
 
     @commands.slash_command(name="voice_reject")
     async def reject(self, inter: ApplicationCommandInteraction, member: disnake.Member):
@@ -223,6 +235,10 @@ class VoiceMaster(commands.Cog):
             if (self.heshmap[idChannel]["owner"] == inter.author.id):
                 await channel.set_permissions(member, overwrite=disnake.PermissionOverwrite(connect=False))
                 await member.edit(voice_channel=None)
+            else:
+                await inter.send("У тебя нет прав.")
+        else:
+            await inter.send("Канал не найден.")
 
     @commands.slash_command(name="voice_permit")
     async def permit(self, inter: ApplicationCommandInteraction, member: disnake.Member):
@@ -231,7 +247,10 @@ class VoiceMaster(commands.Cog):
         if idChannel in self.heshmap:
             if (self.heshmap[idChannel]["owner"] == inter.author.id):
                 await channel.set_permissions(member, overwrite=disnake.PermissionOverwrite(connect=True))
-    
+            else:
+                await inter.send("У тебя нет прав.")
+        else:
+            await inter.send("Канал не найден.")
 
     @commands.slash_command(name="voice_claim")
     async def claim(self, inter: ApplicationCommandInteraction):
@@ -245,6 +264,8 @@ class VoiceMaster(commands.Cog):
                 embed = disnake.Embed(description="Вы успешно забрали канал теперь вы новый владлиц.")
 
             await inter.send(embed=embed)
+        else:
+            await inter.send("Канал не найден.")
 
     @commands.slash_command(name="voice_name")
     async def name(self, inter: ApplicationCommandInteraction, name: str):
@@ -252,9 +273,17 @@ class VoiceMaster(commands.Cog):
         channel: disnake.GuildChannel = inter.author.guild.get_channel(idChannel)
         if idChannel in self.heshmap:
             if (self.heshmap[idChannel]["owner"] == inter.author.id):
-                await channel.edit(name=name)
-                embed = disnake.Embed(description=f"Вы успешно изменили названия канала на {name}.")
-                await inter.send(embed=embed)
-
+                if self.heshmap[idChannel]["timeOutName"] == 0 or self.heshmap[idChannel]["timeOutName"] < time.time():
+                    await channel.edit(name=name)
+                    self.heshmap[idChannel]["timeOutName"] = time.time() + 120
+                    embed = disnake.Embed(description=f"Вы успешно изменили названия канала на {name}.")
+                    await inter.send(embed=embed)
+                else:
+                    remaining_time = int(self.heshmap[idChannel]["timeOutName"] - time.time())
+                    await inter.send(f"Вы не можете изменить названия сейчас. Подождите {remaining_time} секунд.")
+            else:
+                await inter.send("У тебя нет прав для изменения лимита.")
+        else:
+            await inter.send("Канал не найден.")
 def setup(bot):
     bot.add_cog(VoiceMaster(bot))
