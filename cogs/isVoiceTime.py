@@ -37,7 +37,6 @@ class isVoiceTime(commands.Cog):
                     cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
                     row = cur.fetchone()
 
-
                 self.heshmap[member.id] = time.time()
 
             elif before.channel is not None and after.channel is None:

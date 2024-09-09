@@ -61,11 +61,7 @@ LIMIT ?;
             text += f"{medal} <@{row[1]}>\nВремя: {int(days)}д {int(hours)}ч {int(minutes)}м\n\n"
 
         await ctx.send(
-            embed=disnake.Embed(description=text, colour=self.ProfileColor).set_image(url="https://cdn.discordapp.com/attachments/1071030207726755882/1216159185767497828/graund.png?ex=66c67201&is=66c52081&hm=269a763945fef2aff03bc746e97d383b8776db4ef7c3771fd3c29b5a853cfdce&"),
-            components=[
-                disnake.ui.Button(label="<", style=disnake.ButtonStyle.success, custom_id="<"),
-                disnake.ui.Button(label=">", style=disnake.ButtonStyle.danger, custom_id=">"),
-            ])
+            embed=disnake.Embed(description=text, colour=self.ProfileColor).set_image(url="https://cdn.discordapp.com/attachments/1071030207726755882/1216159185767497828/graund.png?ex=66c67201&is=66c52081&hm=269a763945fef2aff03bc746e97d383b8776db4ef7c3771fd3c29b5a853cfdce&"))
 
 
 

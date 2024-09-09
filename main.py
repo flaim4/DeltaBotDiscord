@@ -18,13 +18,13 @@ cur = Data.getCur()
 
 @bot.event
 async def on_ready():
-	await bot.change_presence(status=disnake.Status.online, activity=disnake.Activity(type=disnake.ActivityType.watching, name="Porn Hub", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"))#Not started
+	await bot.change_presence(status=disnake.Status.online, activity=disnake.Activity(type=disnake.ActivityType.watching, name="DOORS 2", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"))#Not started
 	print('Successful login in:', bot.user)
 
 for filename in os.listdir('./cogs'):
     if filename.endswith('.cls.py'):
 
-       with open(f"./cogs/{filename}", 'r', encoding='utf-8') as file:
+        with open(f"./cogs/{filename}", 'r', encoding='utf-8') as file:
            namespace = {}
            exec(file.read(), namespace)
 

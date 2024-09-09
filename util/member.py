@@ -109,3 +109,27 @@ class Member(DBWapper):
         seconds %= 60
         
         return days, hours, minutes, seconds
+    
+    @staticmethod
+    def getLevelMember(guild: disnake.Guild, member: disnake.Member):
+        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (guild.id, member.id))
+        row = Member.cur.fetchone()
+        if row:
+            return row[5]
+        else: 
+            Member.execute("""INSERT INTO Users (server_id, user_id, lvl) VALUES (?, ?, ?)""",
+                            (guild.id, member.id, 0))
+            Data.commit()
+            return 0
+        
+    @staticmethod
+    def getXpMember(guild: disnake.Guild, member: disnake.Member):
+        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (guild.id, member.id))
+        row = Member.cur.fetchone()
+        if row:
+            return row[6]
+        else: 
+            Member.execute("""INSERT INTO Users (server_id, user_id, xp) VALUES (?, ?, ?)""",
+                            (guild.id, member.id, 0))
+            Data.commit()
+            return 0

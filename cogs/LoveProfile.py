@@ -10,19 +10,20 @@ class LoveProfile(commands.Cog):
         self.bot = bot
         self.hesmap = {}
 
-    @commands.slash_command()
-    async def marry(self, ctx, member: disnake.Member):
-        if (member.id != ctx.author.id):
-            embed = disnake.Embed(description=f"### Заключение брака\n <@{member.id}>, Вы согласны вступить в брак с <@{ctx.author.id}>?", color=ProfileColor)
-            components = [
-                disnake.ui.Button(label="Да", style=disnake.ButtonStyle.gray, custom_id="yes"),
-                disnake.ui.Button(label="Нет", style=disnake.ButtonStyle.gray, custom_id="no")
-            ]
-            await ctx.send(embed=embed, components=components)
-            msg = await ctx.original_message()
-            self.hesmap[msg.id] = {"msg": msg, "author": ctx.author, "love": member}
-        else: 
-            await ctx.send("Вы не можете пригласить себя в брак!", ephemeral=True)
+
+    # @commands.slash_command()
+    # async def marry(self, ctx, member: disnake.Member):
+    #     if (member.id != ctx.author.id):
+    #         embed = disnake.Embed(description=f"### Заключение брака\n <@{member.id}>, Вы согласны вступить в брак с <@{ctx.author.id}>?", color=ProfileColor)
+    #         components = [
+    #             disnake.ui.Button(label="Да", style=disnake.ButtonStyle.gray, custom_id="yes"),
+    #             disnake.ui.Button(label="Нет", style=disnake.ButtonStyle.gray, custom_id="no")
+    #         ]
+    #         await ctx.send(embed=embed, components=components)
+    #         msg = await ctx.original_message()
+    #         self.hesmap[msg.id] = {"msg": msg, "author": ctx.author, "love": member}
+    #     else: 
+    #         await ctx.send("Вы не можете пригласить себя в брак!", ephemeral=True)
         
 
     @commands.Cog.listener()
