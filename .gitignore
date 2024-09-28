@@ -6,3 +6,5 @@ member.db
 ./commands/
 ./cogs/__pycache__/
 ./util/__pycache__/
+./__pycache__
+__pycache__

@@ -48,13 +48,25 @@ class Profile(commands.Cog):
         
         embed = disnake.Embed(description=f"### Профиль — {member.global_name}", colour=ProfileColor)
         
-        embed.add_field(name="<:Edit_fill:1281281277688942724> Статус", value=f"```{member.status}```", inline=False)
+        activities = member.activities
+        custom_status = next((activity for activity in activities if isinstance(activity, disnake.CustomActivity)), None)
+        if custom_status and custom_status.name:
+            embed.add_field(name="<:Edit_fill:1281281277688942724> Статус", value=f"```{custom_status.name}```", inline=False)
+        else:
+            embed.add_field(name="<:Edit_fill:1281281277688942724> Статус", value=f"```Статус не установлен.```", inline=False)
         embed.add_field(name="<:Hourglass_fill:1281278042978910208> Активность", value=f"```{int(days)}д, {int(hours)}ч, {int(minutes)}м```", inline=False)
-        embed.add_field(name="<:Subtract1:1281279082537156618> Репутация", value=f"```0```", inline=True)
+        embed.add_field(name="<:Subtract1:1281279082537156618> Уровень", value=f"```{Member.getLevelMember(member.guild, member)}```", inline=True)
         embed.add_field(name="<:Wallet_fill:1281280768919998535> Баланс", value=f"```{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
         embed.add_field(name="<:comment_fill:1281279319402090647> Сообщение", value=f"```{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
         embed.set_thumbnail(url=member.avatar)
         await ctx.send(embed=embed) 
+        #               components=[
+        #    disnake.ui.Button(
+        #        label="Ежедневная награда",
+        #        style=disnake.ButtonStyle.secondary,
+        #        custom_id="day"
+        #    )
+        #])
 
 
     @commands.slash_command(description=Data.lang.get("balance.description"))

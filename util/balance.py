@@ -7,19 +7,18 @@ from util.db import DBWapper
 class Balance(DBWapper):
     @staticmethod
     def addBalance(server_id, user_id, cout):
-        with Data.getCur() as cur:
-            cur.execute("SELECT * FROM UsersBalance WHERE server_id = ? AND user_id = ?", (server_id, user_id))
-            row = cur.fetchone()
-            if row:
-                bal = row[2]
-                result = bal + cout
-                cur.execute("""UPDATE UsersBalance SET balance = ? WHERE server_id = ? AND user_id = ?""", (result, server_id, user_id))
-                Data.commit()
-            else: 
-                cur.execute("""INSERT INTO UsersBalance (server_id, user_id, balance) VALUES (?, ?, ?)""",
-                                (server_id, user_id, cout))
-                Data.commit()
-                return cout
+        Balance.cur.execute("SELECT * FROM UsersBalance WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+        row = Balance.cur.fetchone()
+        if row:
+            bal = row[2]
+            result = bal + cout
+            Balance.cur.execute("""UPDATE UsersBalance SET balance = ? WHERE server_id = ? AND user_id = ?""", (result, server_id, user_id))
+            Data.commit()
+        else: 
+            Balance.cur.execute("""INSERT INTO UsersBalance (server_id, user_id, balance) VALUES (?, ?, ?)""",
+                            (server_id, user_id, cout))
+            Data.commit()
+            return cout
         
     @staticmethod
     def getBalance(server_id, user_id):
