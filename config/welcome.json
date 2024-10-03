@@ -1,0 +1,20 @@
+{
+    "messages": [
+        {
+            "description": "## {name} | Добро пожаловать.",
+            "image": "https://media1.tenor.com/m/gfeo4ibN2LsAAAAC/taiga-toradora.gif"
+        },
+        {
+            "description": "## {name} | Отлично, что ты с нами.",
+            "image": "https://media1.tenor.com/m/g0QIOyhPLRQAAAAC/neon_cove-cute.gif"
+        },
+        {
+            "description": "## {name} | Классно, что ты с нами.",
+            "image": "https://media1.tenor.com/m/FIlCOtD3tdwAAAAC/anime-catgirl.gif"
+        },
+        {
+            "description": "## {name} | Приветствуем тебя.",
+            "image": "https://media1.tenor.com/m/G3WsQADueVEAAAAC/sistine-neko.gif"
+        }
+    ]
+}
