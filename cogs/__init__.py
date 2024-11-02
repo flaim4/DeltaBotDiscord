@@ -20,3 +20,4 @@ def load_cogs(bot: commands.Bot, log: Log_Tools) -> None:
                     bot.add_cog(obj(bot))
                     print_log(f"The class {name} is started.")
                     log.write_log(f"The class {name} is started.")
+    
