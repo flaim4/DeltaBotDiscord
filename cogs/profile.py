@@ -55,8 +55,8 @@ class Profile(commands.Cog):
 
         background.save('output_image.png', format='PNG')
 
-    @commands.slash_command(name="level1")
-    async def Level1(self, ctx: disnake.ApplicationCommandInteraction, member: disnake.Member = None):
+    @commands.slash_command(name="level")
+    async def Level(self, ctx: disnake.ApplicationCommandInteraction, member: disnake.Member = None):
         if member is None:
             member = ctx.author
 
