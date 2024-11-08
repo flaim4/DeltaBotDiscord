@@ -1,7 +1,0 @@
-#{profile}
-.description=Отображает профиль пользователя.
-.botr=Я не могу посмотреть профиль бота.
-#end
-
-
-balance.description=Посмотреть.

@@ -1,41 +1,31 @@
-import disnake
-from disnake.ext import commands
 import random
-import settings
+import disnake 
 
-ProfileColor = settings.InvisibleColor
-
-from disnake.interactions.application_command import ApplicationCommandInteraction
+from typing import Dict
+from utility.main import *
+from disnake.ext import commands 
 
 class Welcome(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
 
-    def randomMessage(self, member: disnake.Member) -> disnake.Embed:
-        Hesh = [
-            disnake.Embed(description=f"## {member.name} | Добро пожаловать.", colour=0x2f3136)
-                .set_image(url="https://media1.tenor.com/m/gfeo4ibN2LsAAAAC/taiga-toradora.gif"),
-            disnake.Embed(description=f"## {member.name} | Отлично, что ты с нами.", colour=0x2f3136)
-                .set_image(url="https://media1.tenor.com/m/g0QIOyhPLRQAAAAC/neon_cove-cute.gif"),
-            disnake.Embed(description=f"## {member.name} | Классно, что ты с нами.", colour=0x2f3136)
-                .set_image(url="https://media1.tenor.com/m/FIlCOtD3tdwAAAAC/anime-catgirl.gif"),
-            disnake.Embed(description=f"## {member.name} | Приветствуем тебя.", colour=0x2f3136)
-                .set_image(url="https://media1.tenor.com/m/G3WsQADueVEAAAAC/sistine-neko.gif")
-        ]
-        return Hesh[random.randint(0, 3)]
+    def __init__(self, bot: commands.Bot):
+        self.bot: commands.Bot = bot
+        self.welcome: load_json = load_json()
+
+    def random_message(self, member: disnake.Member) -> disnake.Embed:
+        message: Dict[str, str] = random.choice(self.welcome)
+        embed: disnake.Embed = disnake.Embed(
+            description = message['description'].format(name = member.name),
+            colour = 0x2f3136
+        ).set_image(url=message['image'])
+        return embed
 
     @commands.Cog.listener()
-    async def on_member_join(self, member: disnake.Member):
-        if (member.bot):
-            await member.ban()
-        else:
-            embed: disnake.Embed = self.randomMessage(member)   
-            channel: disnake.guild.GuildChannel = await member.guild.get_channel(1222841123597324370)
-            welcomeRole: disnake.Role = await member.guild.get_role(1208444981849620642)
-            if (welcomeRole):
-                await member.add_roles(welcomeRole)
-            if channel:
-                await channel.send(embed=embed)
-
-def setup(bot: commands.Bot): 
-    bot.add_cog(Welcome(bot))
+    async def on_member_join(self, member: disnake.Member) -> None: 
+        print_log(f"{member.name}, join in {member.guild.name}")
+        embed: disnake.Embed = self.random_message(member)   
+        channel: disnake.TextChannel = member.guild.get_channel(1291128236406734940)
+        welcome_role: disnake.Role = member.guild.get_role(1165662641725919263)
+        if welcome_role:
+            await member.add_roles(welcome_role)
+        if channel:
+            await channel.send(embed=embed)

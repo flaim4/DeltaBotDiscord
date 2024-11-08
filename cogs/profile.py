@@ -1,118 +1,77 @@
-import disnake 
+import disnake
 from disnake.ext import commands
-from disnake import TextInputStyle
-import sqlite3
-import time
-import settings
-from datetime import datetime
-from disnake import colour
-from util.member import Member
-from util.balance import Balance
-
-from util.db import Data
+from PIL import Image, ImageDraw, ImageFont
+import aiohttp
+from io import BytesIO
 
 class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(description=Data.lang.get("profile.description"))
-    async def profile(self, ctx, member: disnake.Member = None):
-        
-        if ctx.author.bot:
-            return
-        
+    async def process_avatar(self, avatar_url: str) -> Image:
+        """Обрабатывает аватар, чтобы сделать его круглым и изменить размер."""
+        async with aiohttp.ClientSession() as session:
+            async with session.get(avatar_url) as response:
+                avatar: Image = Image.open(BytesIO(await response.read())).convert("RGBA")
+
+        avatar = avatar.resize((156, 156), Image.LANCZOS)
+
+        mask = Image.new("L", (156, 156), 0)
+        draw_mask = ImageDraw.Draw(mask)
+        draw_mask.ellipse((0, 0, 154, 154), fill=255)
+
+        rounded_avatar = Image.new("RGBA", (156, 156))
+        rounded_avatar.paste(avatar, (0, 0), mask)
+
+        return rounded_avatar
+
+    def create_progress_bar(self, current_xp, max_xp, width=676, height=40) -> Image:
+        """Создает изображение с прогресс-баром с закругленными углами."""
+        bar_image: Image = Image.new("RGBA", (width, height), (255, 255, 255, 0))
+        draw = ImageDraw.Draw(bar_image)
+
+        filled_width = int(width * (current_xp / max_xp))
+
+        draw.rounded_rectangle([0, 0, width, height], radius=19, fill=(33, 33, 33, 255))
+
+        draw.rounded_rectangle([0, 0, filled_width, height], radius=19, fill=(39, 188, 143, 255))
+
+        return bar_image
+
+    def renderLevelImage(self, text: str, avatar: Image, current_xp: int, max_xp: int):
+        """Рендерит изображение уровня с текстом, аватаром и прогресс-баром."""
+        background: Image = Image.open('C:/code/pyDiscord/img/Level.png')
+
+        background.paste(avatar, (23, 23), avatar)
+
+        progress_bar = self.create_progress_bar(current_xp, max_xp)
+
+        background.paste(progress_bar, (200, 139), progress_bar)
+
+        font = ImageFont.truetype('C:/code/pyDiscord/font/Montserrat-SemiBold.ttf', size=41)
+
+        draw: ImageDraw = ImageDraw.Draw(background)
+        draw.text((203, 23), text, font=font, fill="white")
+
+        background.save('output_image.png', format='PNG')
+
+    @commands.slash_command(name="level")
+    async def Level(self, ctx: disnake.ApplicationCommandInteraction, member: disnake.Member = None):
         if member is None:
             member = ctx.author
 
-        if member.bot:
-            await ctx.send(Data.lang.get("profile.botr"), ephemeral=True)
-            return
-        
-        # if (Member.getLoveMember(member.guild.id, member.id) is None):
-        #     components = [disnake.ui.Button(label="Открыть любовный профиль", style=disnake.ButtonStyle.blurple, custom_id="love", disabled=True)]
-        # else:
-        #     components = [disnake.ui.Button(label="Открыть любовный профиль", style=disnake.ButtonStyle.blurple, custom_id="love", disabled=False)]
+        text = f"{member.name}"
+        avatar_url = str(member.display_avatar.url)
 
-        name=member.display_name
-        server = ctx.guild
+        current_xp = 56
+        max_xp = 1000 
 
-        voice_seconds = Member.getCountSecondVoice(member.guild.id, member.id)
-        
-        if voice_seconds is None or voice_seconds == 0:
-            days, hours, minutes, seconds = 0, 0, 0, 0
-        else:
-            days, hours, minutes, seconds = Member.convert_seconds(voice_seconds)
+        rounded_avatar = await self.process_avatar(avatar_url)
 
-        ProfileColor = settings.InvisibleColor
-        ErrorColor = settings.ErrorColor
-        
-        embed = disnake.Embed(description=f"### Профиль — {member.global_name}", colour=ProfileColor)
-        
-        activities = member.activities
-        custom_status = next((activity for activity in activities if isinstance(activity, disnake.CustomActivity)), None)
-        if custom_status and custom_status.name:
-            embed.add_field(name="<:Edit_fill:1281281277688942724> Статус", value=f"```{custom_status.name}```", inline=False)
-        else:
-            embed.add_field(name="<:Edit_fill:1281281277688942724> Статус", value=f"```Статус не установлен.```", inline=False)
-        embed.add_field(name="<:Hourglass_fill:1281278042978910208> Активность", value=f"```{int(days)}д, {int(hours)}ч, {int(minutes)}м```", inline=False)
-        embed.add_field(name="<:Subtract1:1281279082537156618> Уровень", value=f"```{Member.getLevelMember(member.guild, member)}```", inline=True)
-        embed.add_field(name="<:Wallet_fill:1281280768919998535> Баланс", value=f"```{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
-        embed.add_field(name="<:comment_fill:1281279319402090647> Сообщение", value=f"```{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
-        embed.set_thumbnail(url=member.avatar)
-        await ctx.send(embed=embed) 
-        #               components=[
-        #    disnake.ui.Button(
-        #        label="Ежедневная награда",
-        #        style=disnake.ButtonStyle.secondary,
-        #        custom_id="day"
-        #    )
-        #])
+        self.renderLevelImage(text, rounded_avatar, current_xp, max_xp)
 
-
-    @commands.slash_command(description=Data.lang.get("balance.description"))
-    @commands.default_member_permissions(administrator=True)
-    async def balance(self, ctx):
-        await ctx.send(Balance.getBalance(ctx.guild.id, ctx.author.id))
-
-    @commands.slash_command(description="Добавить баланс")
-    @commands.default_member_permissions(administrator=True)
-    async def addbalance(self, ctx, member: disnake.Member = None, count: int = 0):
-        Balance.addBalance(ctx.guild.id, member.id, count)
-
-    @commands.slash_command(description="Установить баланс")
-    @commands.default_member_permissions(administrator=True)
-    async def setbalance(self, ctx, member: disnake.Member = None, count: int = 0):
-        Balance.setBalance(ctx.guild.id, member.id, count)
-
-    @commands.slash_command(description="Забрать баланс")
-    @commands.default_member_permissions(administrator=True)
-    async def spendbalance(self, ctx, member: disnake.Member = None, count: int = 0):
-        Balance.spendBalance(ctx.guild.id, member.id, count)
-
-
-    # @commands.Cog.listener(disnake.Event.button_click)
-    # async def button_click(self, inter: disnake.MessageInteraction):
-    #     if (inter.component.custom_id == "love"):
-    #         embed = disnake.Embed(description=f"### Любовный профиль — {inter.author.global_name}")
-    #         love_member = inter.guild.get_member(Member.getLoveMember(inter.guild.id, inter.author.id))
-    #         embed.add_field(name = "> Партнер", value = f"```{love_member.global_name}```", inline=False)
-    #         current_datetime = datetime.fromtimestamp(Member.getLoveMemberDataRegister(inter.guild.id, inter.user))
-    #         formatted_time = current_datetime.strftime('%Y-%m-%d')
-    #         embed.add_field(name = "> Регистрация", value = f"```{formatted_time}```", inline=True)
-
-    #         voice_seconds = time.time() - Member.getLoveMemberDataRegister(inter.guild.id, inter.user)
-        
-    #         if voice_seconds is None or voice_seconds == 0:
-    #             days, hours, minutes, seconds = 0, 0, 0, 0
-    #         else:
-    #             days, hours, minutes, seconds = Member.convert_seconds(voice_seconds)
-
-    #         embed.add_field(name = "> Всего вместе", value = f"```{int(days)}д {int(hours)}ч, {int(minutes)}м  ```", inline=True)
-    #         embed.add_field(name = "> Времени проведено в любовной комнате", value = f"```{Member.getLoveMemberTimeVoice(inter.guild.id, inter.user)}```", inline=False)
-    #         embed.set_thumbnail(url=inter.author.avatar.url)
-    #         ProfileColor = settings.InvisibleColor
-    #         embed.color = ProfileColor
-    #         await inter.send(embed=embed)
+        with open('output_image.png', 'rb') as f:
+            await ctx.send(file=disnake.File(f, 'LevelImage.png'))
 
 def setup(bot):
     bot.add_cog(Profile(bot))
