@@ -18,7 +18,7 @@ cur = Data.getCur()
 
 @bot.event
 async def on_ready():
-	await bot.change_presence(status=disnake.Status.online, activity=disnake.Activity(type=disnake.ActivityType.watching, name="DOORS 2", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"))#Not started
+	await bot.change_presence(status=disnake.Status.online, activity=disnake.Activity(type=disnake.ActivityType.watching, name="Sub World", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"))
 	print('Successful login in:', bot.user)
 
 for filename in os.listdir('./cogs'):

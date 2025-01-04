@@ -10,6 +10,12 @@ class PageShop:
     def get_items(self):
         return self.list
 
+    def get_role_by_id(self, role_id):
+        for item in self.list:
+            if item["id"] == role_id:
+                return item
+        return None
+
 class PageShopManager:
     def __init__(self, items_per_page):
         self.pages = []
