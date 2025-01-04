@@ -1,1 +1,1 @@
-# DeltaBotDiscord
+<img src="https://cdn.discordapp.com/attachments/1235315817445331008/1324907621924212837/Frame_185_5.png?ex=6779dbe0&is=67788a60&hm=92b7abbced100e136dc31ef6536d741746f40bf2ad62f66ba74ef09cba9d7839&">
