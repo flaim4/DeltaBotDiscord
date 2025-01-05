@@ -1,31 +1,66 @@
-class PageShop:
+from util.db import DBWapper, Data
+
+class PageShop(DBWapper):
     def __init__(self):
+        super().__init__()
         self.list = []
-        self.id_counter = 0
 
-    def addRole(self, role, user, price):
-        self.id_counter += 1
-        self.list.append({"id": self.id_counter, "role": role, "user": user, "price": price})
+    def get_role_by_role_id(self, role_id, server_id):
+        self.cur.execute("SELECT id, role_id, user_id, price FROM Role WHERE server_id = ? AND role_id = ?", (server_id, role_id))
+        row = self.cur.fetchone()
+        return {"id": row[0], "role_id": row[1], "user_id": row[2], "price": row[3]} if row else None
 
-    def get_items(self):
-        return self.list
+    def add_role(self, role_id, user_id, price, server_id):
+        self.cur.execute("SELECT MAX(id) FROM Role")
+        max_id = self.cur.fetchone()[0]
 
-    def get_role_by_id(self, role_id):
-        for item in self.list:
-            if item["id"] == role_id:
-                return item
+        new_id = max_id + 1 if max_id is not None else 1
+
+        self.cur.execute("""INSERT INTO Role (id, server_id, user_id, role_id, price) VALUES (?, ?, ?, ?, ?)""", (new_id, server_id, user_id, role_id, price))
+        Data.commit()
+
+    def get_items(self, server_id):
+        self.cur.execute("SELECT id, role_id, user_id, price FROM Role WHERE server_id = ?", (server_id,))
+        rows = self.cur.fetchall()
+        return [{"id": row[0], "role": row[1], "user": row[2], "price": row[3]} for row in rows]
+
+    def get_role_by_id(self, role_id, server_id):
+        self.cur.execute("SELECT id, role_id, user_id, price FROM Role WHERE server_id = ? AND id = ?", (server_id, role_id))
+        row = self.cur.fetchone()
+        return {"id": row[0], "role": row[1], "user": row[2], "price": row[3]} if row else None
+
+
+    def remove_role_by_id(self, role_id, server_id):
+        self.cur.execute(
+            "SELECT id, role_id, user_id, price FROM Role WHERE server_id = ? AND id = ?",
+            (server_id, role_id)
+        )
+        row = self.cur.fetchone()
+
+        if row:
+            self.cur.execute(
+                "DELETE FROM Role WHERE server_id = ? AND id = ?",
+                (server_id, role_id)
+            )
+            Data.commit()
+            return {"id": row[0], "role": row[1], "user": row[2], "price": row[3]}
         return None
 
 class PageShopManager:
-    def __init__(self, items_per_page):
-        self.pages = []
+    def __init__(self, items_per_page, page_shop, server_id):
         self.items_per_page = items_per_page
-        self.current_page_index = 0
-
-    def load_items(self, items):
+        self.page_shop = page_shop
+        self.server_id = server_id
         self.pages = []
-        for i in range(0, len(items), self.items_per_page):
-            self.pages.append(items[i:i + self.items_per_page])
+        self.current_page_index = 0
+        self.load_pages()
+
+    def load_pages(self):
+        items = self.page_shop.get_items(self.server_id)
+        self.pages = [
+            items[i:i + self.items_per_page]
+            for i in range(0, len(items), self.items_per_page)
+        ]
 
     def get_current_page(self):
         if self.pages:
@@ -35,7 +70,9 @@ class PageShopManager:
     def next_page(self):
         if self.current_page_index < len(self.pages) - 1:
             self.current_page_index += 1
+            return True
 
     def previous_page(self):
         if self.current_page_index > 0:
             self.current_page_index -= 1
+            return True
