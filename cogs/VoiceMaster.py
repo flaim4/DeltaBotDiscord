@@ -33,14 +33,12 @@ class VoiceMaster(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cur = Data.getCur()
-        self.heshmap = {}  # Исправлено на "hashmap" для правильного наименования
+        self.heshmap = {}
 
     async def updateCountMemberInVoice(self, guild: disnake.Guild, channel: disnake.VoiceChannel):
-            """Обновляет количество участников в канале и удаляет канал, если участников не осталось."""
             if channel.id in self.heshmap:
-                # Обновляем количество участников в hashmap
                 self.heshmap[channel.id]["countMember"] = len(channel.members)
-                if self.heshmap[channel.id]["countMember"] <= 0:  # Если участников нет, удаляем канал
+                if self.heshmap[channel.id]["countMember"] <= 0:
                     voice_channel = guild.get_channel(self.heshmap[channel.id]["channelId"])
                     if voice_channel:
                         await voice_channel.delete()
@@ -55,7 +53,6 @@ class VoiceMaster(commands.Cog):
             print(self.heshmap)
 
             if after.channel.id == 1281715042567458918: 
-                # Создание нового голосового канала для пользователя
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
                 self.heshmap[channel.id] = {
                     "channelId": channel.id,
@@ -65,29 +62,17 @@ class VoiceMaster(commands.Cog):
                     "timeOutLimit": 0
                 }
                 await member.move_to(channel=channel)
-    
 
-            # Сообщение в системный канал
-            if guild.system_channel:
-                await guild.system_channel.send(f'{member.display_name} зашел в {after.channel.name}.')
-
-        # Игрок вышел из голосового канала
         elif before.channel is not None and after.channel is None:
             print(self.heshmap)
  
             if before.channel.id in self.heshmap:
                 await self.updateCountMemberInVoice(guild, before.channel)
 
-            # Сообщение в системный канал
-            if guild.system_channel:
-                await guild.system_channel.send(f'{member.display_name} вышел из {before.channel.name}.')
-
-        # Игрок перешел в другой голосовой канал
         elif before.channel != after.channel:
             print(self.heshmap)
 
             if after.channel.id == 1281715042567458918: 
-                # Создание нового голосового канала для пользователя
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
                 self.heshmap[channel.id] = {
                     "channelId": channel.id,
@@ -104,15 +89,10 @@ class VoiceMaster(commands.Cog):
             if after.channel and after.channel.id in self.heshmap:
                 await self.updateCountMemberInVoice(guild, after.channel)
 
-            # Сообщение о переходе в системный канал
-            if guild.system_channel:
-                await guild.system_channel.send(f'{member.display_name} перешел из {before.channel.name} в {after.channel.name}.')
-
     @commands.command()
     async def panel(self, ctx: ApplicationCommandInteraction):
         embed = disnake.Embed(description="### Управление приватной комнатой")
-
-        # button: disnake.Button = disnake.Button(style = disnake.ButtonStyle.grey, custom_id = "loock", emoji = "")
+        
         components = [disnake.ui.Button(label="", style = disnake.ButtonStyle.grey, custom_id="loock", emoji="🔒"), disnake.ui.Button(label="", style = disnake.ButtonStyle.grey, custom_id="view", emoji="👁️"), disnake.ui.Button(label="", style = disnake.ButtonStyle.grey, custom_id="limit", emoji="👥"), disnake.ui.Button(label="", style = disnake.ButtonStyle.grey, custom_id="renject", emoji="❌")]
         await ctx.send(embed=embed, components=components)
 

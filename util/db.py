@@ -19,6 +19,7 @@ class Data:
     con.execute("""CREATE TABLE IF NOT EXISTS VoiceMaster (server_id INTEGER, user_id INTEGER, channel_id, json TEXT)""")
     con.execute("""CREATE TABLE IF NOT EXISTS Love (server_id INTEGER, user_id INTEGER, member_love, json TEXT)""")
     con.execute("""CREATE TABLE IF NOT EXISTS Role (id INTEGER,server_id INTEGER NOT NULL,user_id INTEGER NOT NULL, role_id INTEGER NOT NULL,price INTEGER NOT NULL);""")
+    con.execute("""CREATE TABLE IF NOT EXISTS TimeOut (server_id INTEGER NOT NULL, user_id INTEGER NOT NULL, json TEXT);""")
 
     con.commit()
 
