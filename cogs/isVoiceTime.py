@@ -1,11 +1,11 @@
 from disnake.ext import commands
 import sqlite3
 import asyncio
-import disnake 
+import disnake
 import time
 from util.member import Member
-
 from util.db import Data
+from util.balance import Balance
 
 class isVoiceTime(commands.Cog):
 
@@ -53,6 +53,11 @@ class isVoiceTime(commands.Cog):
                         cur.execute("""UPDATE Users SET voice_activ=? WHERE server_id=? AND user_id=?""",
                                     (voice_time, server_id, member.id,))
                         Data.commit()
+
+                        hours_spent = int((end_time - start_time) // 3600)
+                        if hours_spent > 0:
+                            reward = hours_spent * 20
+                            Balance.addBalance(server_id, member.id, reward)
         finally:
             cur.close()
 

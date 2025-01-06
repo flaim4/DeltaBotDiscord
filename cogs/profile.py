@@ -18,6 +18,8 @@ class Profile(commands.Cog):
     @commands.slash_command(description=Data.lang.get("profile.description"))
     async def profile(self, ctx, member: disnake.Member = None):
         
+        await ctx.response.defer()
+
         if ctx.author.bot:
             return
         
