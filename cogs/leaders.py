@@ -75,19 +75,19 @@ class Leaders(commands.Cog):
         )
 
         buttons = View()
-        buttons.add_item(Button(emoji="<:Vector10111:1325288783817605141>", label="Назад", custom_id="prev_page", disabled=self.current_page_index == 0))
-        buttons.add_item(Button(emoji="<:Vector1011:1325288770379190283>", label="Далее", custom_id="next_page", disabled=self.current_page_index >= len(self.pages) - 1))
+        buttons.add_item(Button(emoji="<:Vector10111:1325288783817605141>", label="Назад", custom_id="prev_page_leader", disabled=self.current_page_index == 0))
+        buttons.add_item(Button(emoji="<:Vector1011:1325288770379190283>", label="Далее", custom_id="next_page_leader", disabled=self.current_page_index >= len(self.pages) - 1))
 
         await ctx.send(embed=embed, view=buttons)
 
     @commands.Cog.listener()
     async def on_button_click(self, inter: disnake.MessageInteraction):
-        if inter.component.custom_id == "next_page":
+        if inter.component.custom_id == "next_page_leader":
             if self.current_page_index < len(self.pages) - 1:
                 self.current_page_index += 1
                 await self.update_leaderboard(inter)
 
-        elif inter.component.custom_id == "prev_page":
+        elif inter.component.custom_id == "prev_page_leader":
             if self.current_page_index > 0:
                 self.current_page_index -= 1
                 await self.update_leaderboard(inter)
@@ -120,8 +120,8 @@ class Leaders(commands.Cog):
         )
 
         buttons = View()
-        buttons.add_item(Button(emoji="<:Vector10111:1325288783817605141>", label="Назад", custom_id="prev_page", disabled=self.current_page_index == 0))
-        buttons.add_item(Button(emoji="<:Vector1011:1325288770379190283>", label="Далее", custom_id="next_page", disabled=self.current_page_index >= len(self.pages) - 1))
+        buttons.add_item(Button(emoji="<:Vector10111:1325288783817605141>", label="Назад", custom_id="prev_page_leader", disabled=self.current_page_index == 0))
+        buttons.add_item(Button(emoji="<:Vector1011:1325288770379190283>", label="Далее", custom_id="next_page_leader", disabled=self.current_page_index >= len(self.pages) - 1))
 
         await inter.response.edit_message(embed=embed, view=buttons)
 
