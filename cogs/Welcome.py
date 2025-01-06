@@ -42,7 +42,7 @@ class Welcome(commands.Cog):
         )
         return embed
     
-    @commands.slash_command()
+    @commands.slash_command(default_member_permissions=disnake.Permissions(administrator=True))
     async def test_invite(self, inter: disnake.ApplicationCommandInteraction):
         random_message = random.choice(self.welcome_messages).format(member_mention=inter.user.mention)
         embed = disnake.Embed(
@@ -53,7 +53,7 @@ class Welcome(commands.Cog):
             ),
             colour=0x2b2d31
         )
-        embed.set_thumbnail(url=inter.user.display_avatar.url)
+        embed.set_thumbnail(url=inter.author.avatar.url if inter.author.avatar else inter.author.default_avatar.url)
         embed.set_image(url=random.choice(self.gif_links))
         embed.set_footer(
             text="Мы надеемся, что тебе здесь понравится!",
@@ -69,7 +69,7 @@ class Welcome(commands.Cog):
         welcome_role = member.guild.get_role(1208444981849620642)
 
         if welcome_role:
-            await member.add_roles(welcome_role, reason="Приветственная роль")
+            await member.add_roles(welcome_role)
 
         if channel:
             embed = self.randomMessage(member)
