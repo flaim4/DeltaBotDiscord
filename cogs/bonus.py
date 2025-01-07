@@ -20,7 +20,7 @@ class Bonus(commands.Cog):
 
         if timeout_info:
             timeout_data = json.loads(timeout_info)
-            last_bonus_time = timeout_data.get("bonus", 0)
+            last_bonus_time = int(timeout_data.get("bonus", 0))
 
             if current_time - last_bonus_time < 86400:
                 remaining_time = 86400 - (current_time - last_bonus_time)
@@ -32,8 +32,14 @@ class Bonus(commands.Cog):
 
         bonus_amount = random.randint(1, 500)
         Balance.addBalance(server_id, user_id, bonus_amount)
-        TimeOut.addTimeOut(server_id, user_id, json.dumps({"bonus": current_time}))
+
+        TimeOut.updateTimeOut(server_id, user_id, json.dumps({"bonus": current_time}))
+
         await ctx.send(f"Поздравляем! Вы получили бонус: {bonus_amount} монет.")
+
+def setup(bot):
+    bot.add_cog(Bonus(bot))
+
 
 
 def setup(bot):
