@@ -1,0 +1,23 @@
+{
+  "dist": {
+    "image": [
+      "https://media1.tenor.com/m/4HvAJpQ5s7wAAAAd/the-rock-murder-drones.gif",
+      "https://media1.tenor.com/m/gfeo4ibN2LsAAAAC/taiga-toradora.gif",
+      "https://media1.tenor.com/m/g0QIOyhPLRQAAAAC/neon_cove-cute.gif",
+      "https://media1.tenor.com/m/FIlCOtD3tdwAAAAC/anime-catgirl.gif",
+      "https://media1.tenor.com/m/G3WsQADueVEAAAAC/sistine-neko.gif",
+      "https://media1.tenor.com/m/3HjuAYmaPfAAAAAd/happy-anime.gif",
+      "https://media1.tenor.com/m/TloDypFZSuAAAAAd/taiga-peace.gif",
+      "https://media1.tenor.com/m/YGfubVP-9lwAAAAd/anime-girl.gif",
+      "https://media1.tenor.com/m/B_4vlGcW-rUAAAAd/fbi-vrchat.gif",
+      "https://media1.tenor.com/m/U2HSnN8eFnsAAAAd/yay-loli.gif"
+    ],
+    "text": [
+      "## {0.name} | Добро пожаловать.",
+      "## {0.name} | Отлично, что ты с нами.",
+      "## {0.name} | Классно, что ты с нами.",
+      "## {0.name} | Хай.",
+      "## {0.name} | Приветствуем тебя."
+    ]
+  }
+}
