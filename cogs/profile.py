@@ -15,7 +15,7 @@ class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.slash_command(description=Data.lang.get("profile.description"))
+    @commands.slash_command(description="Посмотреть профиль")
     async def profile(self, ctx, member: disnake.Member = None):
         
         await ctx.response.defer()
@@ -27,7 +27,7 @@ class Profile(commands.Cog):
             member = ctx.author
 
         if member.bot:
-            await ctx.send(Data.lang.get("profile.botr"), ephemeral=True)
+            await ctx.send("Профиль бота нельзя смотреть", ephemeral=True)
             return
         
         # if (Member.getLoveMember(member.guild.id, member.id) is None):
@@ -71,7 +71,7 @@ class Profile(commands.Cog):
         #])
 
 
-    @commands.slash_command(description=Data.lang.get("balance.description"))
+    @commands.slash_command(description="Узнать баланс")
     @commands.default_member_permissions(administrator=True)
     async def balance(self, ctx):
         await ctx.send(Balance.getBalance(ctx.guild.id, ctx.author.id))
