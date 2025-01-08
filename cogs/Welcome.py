@@ -14,7 +14,7 @@ class Welcome(commands.Cog):
         self.bot = bot
         self.metadata = res.loadJson("welcome")
 
-    def randomMessage(self, member: disnake.Member, channel : disnake.GuildChannel) -> disnake.Embed:
+    def randomMessage(self, member: disnake.Member, channel) -> disnake.Embed:
         embed = disnake.Embed(
             title=f"✨ Добро пожаловать, {member.name}! ✨",
             description=(
