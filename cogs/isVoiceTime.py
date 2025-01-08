@@ -108,8 +108,6 @@ class isVoiceTime(commands.Cog):
                             reward = hours_spent * 20
                             Balance.addBalance(guild.id, member.id, reward)
 
-                        await ctx.send("Время успешно у всех сохранено!")
-
         cur.close()
 
 
