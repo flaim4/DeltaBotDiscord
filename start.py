@@ -1,14 +1,14 @@
 import os
 import sys
 import subprocess
-import time
+from subprocess import Popen
+import asyncio
 
-# Запускаем бота в отдельном процессе
 def start_bot():
     return subprocess.Popen([sys.executable, "main.py"])
 
-def main():
-    bot_process = start_bot()
+async def main():
+    bot_process: Popen = start_bot()
 
     while True:
         command = input("Введите команду (reload для перезагрузки): \n").strip().lower()
@@ -30,4 +30,4 @@ def main():
             print("Неизвестная команда. Используйте 'reload' или 'exit'.")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

@@ -1,7 +1,5 @@
 import sqlite3
 
-from util.Lang import Lang
-
 class Data:
     con = sqlite3.connect("data.db")
 
