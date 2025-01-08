@@ -3,10 +3,6 @@ import sqlite3
 from util.Lang import Lang
 
 class Data:
-    lang = Lang()
-    with open("defult.lang", 'r', encoding='utf-8') as file:
-        lang.load(file)
-
     con = sqlite3.connect("data.db")
 
     @staticmethod
