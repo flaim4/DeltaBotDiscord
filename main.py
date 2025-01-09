@@ -26,7 +26,16 @@ def loadenv():
         return True
 
 
-bot = commands.Bot(command_prefix=meta.command_prefix,intents=disnake.Intents.all())
+bot = commands.Bot(
+    command_prefix=meta.command_prefix,
+    intents=disnake.Intents.all(),
+    status=disnake.Status.online,
+    activity=disnake.Activity(
+        type=disnake.ActivityType.watching,
+        name="DOORS 2",
+        url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+
+)
 if not loadenv():
     sys.exit("Could not find Env file!")
 
@@ -34,7 +43,6 @@ cur = Data.getCur()
 
 @bot.event
 async def on_ready():
-    await bot.change_presence(status=disnake.Status.online, activity=disnake.Activity(type=disnake.ActivityType.watching, name="DOORS 2", url="https://www.youtube.com/watch?v=dQw4w9WgXcQ"))#Not started
     print('Successful login in:', bot.user)
 
 
