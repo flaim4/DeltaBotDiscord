@@ -1,29 +1,23 @@
 from disnake.ext import commands
-from dotenv import load_dotenv
 import importlib.util
 import disnake 
 import os
 import sys
 import json
+import settings
+try:
+    settings.__work_data__ = __work_data__
+    TOKEN = os.getEnv(to, "Profiles")
+except:
+    print("Set test floader.")
+    settings.__work_data__ = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test', 'work'))
+    if not os.path.isdir(settings.__work_data__):
+        os.mkdir(settings.__work_data__)
+    TOKEN = "EnterToken"
+    
 from util.db import Data
 import util.Resouces as res
 meta = res.loadJsonObject("base")
-
-def loadenv():
-    dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-    if os.path.exists(dotenv_path):
-        load_dotenv(dotenv_path)
-        return True
-
-    dotenv_path = os.path.join(os.path.dirname(__file__), "data", '.env')
-    if os.path.exists(dotenv_path):
-        load_dotenv(dotenv_path)
-        return True
-
-    dotenv_path = os.path.join(os.path.dirname(__file__), ".venv", '.env')
-    if os.path.exists(dotenv_path):
-        load_dotenv(dotenv_path)
-        return True
 
 
 bot = commands.Bot(
@@ -36,8 +30,6 @@ bot = commands.Bot(
         url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 )
-if not loadenv():
-    sys.exit("Could not find Env file!")
 
 cur = Data.getCur()
 
@@ -64,7 +56,6 @@ for filename in os.listdir('./cogs'):
         try:
             importlib.import_module(module_name)
             bot.load_extension(module_name)
-            print(f"Загружено расширение: {module_name}")
         except Exception as e:
             print(f"Не удалось загрузить {module_name}: {e}")
 
@@ -73,4 +64,4 @@ if __name__ == "__main__":
     for i in range(len(sys.argv)):
         if sys.argv[i] == "-p":
             to = sys.argv[i+1]
-    bot.run(json.loads(os.getenv('PROFILES'))[to])
+    bot.run(TOKEN)
