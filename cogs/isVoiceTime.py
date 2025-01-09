@@ -19,50 +19,44 @@ class isVoiceTime(commands.Cog):
 
         server_id = member.guild.id
 
+        cur = Data.getCur()
         try:
-            cur = Data.getCur()
+            row = None
+            
             if before.channel is None and after.channel is not None:
-                cur.execute(
-                    """SELECT * FROM Users WHERE server_id = ? AND user_id = ?""",
-                    (server_id, member.id),
-                )
+                cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
                 row = cur.fetchone()
-
+                
                 if row is None:
-                    cur.execute(
-                        """INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
-                        (server_id, member.id, 0),
-                    )
+                    cur.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
+                                (server_id, member.id, 0))
                     Data.commit()
+                    cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
+                    row = cur.fetchone()
 
                 self.heshmap[member.id] = time.time()
 
             elif before.channel is not None and after.channel is None:
-                start_time = self.heshmap.pop(member.id, None)
-                if start_time:
+                if member.id in self.heshmap:
+                    start_time = self.heshmap.pop(member.id)
                     end_time = time.time()
-                    cur.execute(
-                        """SELECT voice_activ FROM Users WHERE server_id = ? AND user_id = ?""",
-                        (server_id, member.id),
-                    )
-                    row = cur.fetchone()
+
+                    if row is None:
+                        cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id))
+                        row = cur.fetchone()
 
                     if row:
-                        voice_time = row[0] + (end_time - start_time)
-                        cur.execute(
-                            """UPDATE Users SET voice_activ = ? WHERE server_id = ? AND user_id = ?""",
-                            (voice_time, server_id, member.id),
-                        )
+                        voice_time = row[3] + (end_time - start_time)
+                        cur.execute("""UPDATE Users SET voice_activ=? WHERE server_id=? AND user_id=?""",
+                                    (voice_time, server_id, member.id,))
                         Data.commit()
 
                         hours_spent = int((end_time - start_time) // 3600)
                         if hours_spent > 0:
                             reward = hours_spent * 20
                             Balance.addBalance(server_id, member.id, reward)
-
+        finally:
             cur.close()
-        except Exception as e:
-            print(f"Error in on_voice_state_update: {e}")
 
     @commands.Cog.listener()
     async def on_ready(self):
