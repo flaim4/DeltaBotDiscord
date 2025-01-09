@@ -22,11 +22,10 @@ class Bonus(commands.Cog):
             timeout_info = TimeOut.getTimeOut(server_id, user_id)
             current_time = time.time()
             
-            if timeout_info:
+            if not (timeout_info == None):
                 timeout_data = json.loads(timeout_info)
                 last_bonus_time = int(timeout_data.get("bonus", 0))
-                
-                if current_time - last_bonus_time < 86400:
+                if current_time < (last_bonus_time + 86400):
                     remaining_time = 86400 - (current_time - last_bonus_time)
                     hours = int(remaining_time // 3600)
                     minutes = int((remaining_time % 3600) // 60)

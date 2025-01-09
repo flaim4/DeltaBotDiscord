@@ -60,7 +60,7 @@ for filename in os.listdir('./cogs'):
         except Exception as e:
             print(f"Не удалось загрузить {module_name}: {e}")
 
-def main():
+if __name__ == "__main__":
     to = "test"
     for i in range(len(sys.argv)):
         if sys.argv[i] == "-p":
