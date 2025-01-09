@@ -2,6 +2,7 @@ import disnake
 from disnake.ext import commands
 from util.db import Data
 import time 
+import util.Resouces as res
 
 from disnake import TextInputStyle
 
@@ -34,6 +35,7 @@ class VoiceMaster(commands.Cog):
         self.bot = bot
         self.cur = Data.getCur()
         self.heshmap = {}
+        self.metadata = res.loadJsonObject("voicemaster")
 
     async def updateCountMemberInVoice(self, guild: disnake.Guild, channel: disnake.VoiceChannel):
             if channel.id in self.heshmap:
@@ -47,12 +49,12 @@ class VoiceMaster(commands.Cog):
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: disnake.Member, before, after):
         guild: disnake.Guild = member.guild
-        category = disnake.utils.get(guild.categories, id=1280289015995826184)
+        category = disnake.utils.get(guild.categories, id=self.metadata.category)
 
         if before.channel is None and after.channel is not None:
             print(self.heshmap)
 
-            if after.channel.id == 1281715042567458918: 
+            if after.channel.id == self.metadata.channel: 
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
                 self.heshmap[channel.id] = {
                     "channelId": channel.id,
@@ -72,7 +74,7 @@ class VoiceMaster(commands.Cog):
         elif before.channel != after.channel:
             print(self.heshmap)
 
-            if after.channel.id == 1281715042567458918: 
+            if after.channel.id == self.metadata.channel: 
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
                 self.heshmap[channel.id] = {
                     "channelId": channel.id,
