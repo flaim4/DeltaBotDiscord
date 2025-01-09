@@ -5,9 +5,9 @@ import os
 import sys
 import json
 import settings
+TOKEN = None
 try:
     settings.__work_data__ = __work_data__
-    TOKEN = os.getEnv(to, "Profiles")
 except:
     print("Set test floader.")
     settings.__work_data__ = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test', 'work'))
@@ -64,4 +64,6 @@ if __name__ == "__main__":
     for i in range(len(sys.argv)):
         if sys.argv[i] == "-p":
             to = sys.argv[i+1]
+    if TOKEN == None:
+        TOKEN = os.getEnv(to, "Profiles")
     bot.run(TOKEN)
