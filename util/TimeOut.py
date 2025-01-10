@@ -29,7 +29,9 @@ class TimeOut(DBWapper):
     @staticmethod
     def updateTimeOut(server_id, user_id, timeout_data):
         TimeOut.execute(
-            "INSERT OR REPLACE INTO TimeOut (server_id, user_id, json) VALUES (?, ?, ?)",
+            """INSERT INTO TimeOut (server_id, user_id, json)
+                VALUES (?, ?, ?)
+                ON CONFLICT(server_id, user_id) DO UPDATE SET json = excluded.json""",
             (server_id, user_id, timeout_data)
         )
         TimeOut.commit()
