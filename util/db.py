@@ -1,9 +1,8 @@
 import sqlite3
-import settings
 import os
 
 class Data:
-    con = sqlite3.connect(os.path.join(settings.__work_data__, "data.db"))
+    con = sqlite3.connect(os.path.join(os.work_dir, "data.db"))
 
     @staticmethod
     def getCur():

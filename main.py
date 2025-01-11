@@ -6,13 +6,11 @@ import sys
 import json
 import settings
 TOKEN = None
-try:
-    settings.__work_data__ = __work_data__
-except:
+if not hasattr(os, "work_dir"):
     print("Set test floader.")
-    settings.__work_data__ = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test', 'work'))
-    if not os.path.isdir(settings.__work_data__):
-        os.mkdir(settings.__work_data__)
+    os.work_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test', 'work'))
+    if not os.path.isdir(os.work_dir):
+        os.makedirs(os.work_dir, exist_ok=True)
     TOKEN = "EnterToken"
     
 from util.db import Data
@@ -65,5 +63,5 @@ if __name__ == "__main__":
         if sys.argv[i] == "-p":
             to = sys.argv[i+1]
     if TOKEN == None:
-        TOKEN = os.getEnv(to, "Profiles")
+        TOKEN = f"{os.env_provider:Profiles:{to}}"
     bot.run(TOKEN)
