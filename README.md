@@ -1,1 +1,5 @@
-<img src="https://cdn.discordapp.com/attachments/1235315817445331008/1324908568855580712/Frame_185_6.png?ex=6779dcc2&is=67788b42&hm=8686bd99236a6edae8e1f951e74401b5cc876dfe82dd6e2e63d42adca0bd0c6b&">
+## Leaders in time spent in voice chat
+<img src="https://media.discordapp.net/attachments/1082787483772801025/1330654732657627196/image.png?ex=678ec44a&is=678d72ca&hm=4f3246c7d4d51b64ff627c36e6f240a4959202306dbece41bfbdcba8a8f18d7b&=&format=webp&quality=lossless&width=950&height=447">
+
+## User profile
+<img src="https://media.discordapp.net/attachments/1082787483772801025/1330654721366691871/image.png?ex=678ec447&is=678d72c7&hm=0c213a4119ebc951b78d629dfa3cab9c9ab4b32d4f305b6d4befb49afd1efb29&=&format=webp&quality=lossless&width=605&height=358">
