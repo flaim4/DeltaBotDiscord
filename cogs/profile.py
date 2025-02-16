@@ -11,9 +11,11 @@ from util.balance import Balance
 
 from util.db import Data
 
+from disnake.interactions.application_command import ApplicationCommandInteraction
+
 class Profile(commands.Cog):
     def __init__(self, bot):
-        self.bot = bot
+        self.bot: commands.Bot = bot
 
     @commands.slash_command(description="Посмотреть профиль")
     async def profile(self, ctx, member: disnake.Member = None):
@@ -90,6 +92,30 @@ class Profile(commands.Cog):
     @commands.default_member_permissions(administrator=True)
     async def spendbalance(self, ctx, member: disnake.Member = None, count: int = 0):
         Balance.spendBalance(ctx.guild.id, member.id, count)
+
+    @commands.slash_command(description="")
+    async def pay(self, ctx: ApplicationCommandInteraction, member: disnake.Member, count: int):
+        if (member.id == ctx.author.id):
+            await ctx.send("Атя тя", ephemeral=True)
+            return
+        if (count <= 0):
+            await ctx.send("Меньше нельзя!", ephemeral=True)
+            return
+        if Balance.getBalance(ctx.guild.id, ctx.author.id) < count:
+            await ctx.send("У вас нету денег?", ephemeral=True)
+            return
+            
+        Balance.spendBalance(ctx.guild.id, ctx.author.id, count)
+        Balance.addBalance(ctx.guild.id, member.id, count)
+        await ctx.send(f"Вы успешно перевели деньги пользователю <@{member.id}> {count} монет!")
+
+        embed = disnake.Embed(description=f"<@{ctx.author.id}> перевел <@{member.id}> <@{count}> монет", timestamp=disnake.utils.utcnow())
+
+        embed.set_author(name=f"{ctx.author.name}",
+                         icon_url=f"{ctx.author.display_avatar.url}")
+        
+        if self.bot.get_channel(1340822278346379284) is not None:
+            await self.bot.get_channel(1340822278346379284).send(embed=embed)
 
 
     # @commands.Cog.listener(disnake.Event.button_click)
