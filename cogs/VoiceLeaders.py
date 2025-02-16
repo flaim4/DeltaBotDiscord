@@ -5,7 +5,7 @@ from disnake import Embed
 from util.db import Data
 
 
-class Leaders(commands.Cog):
+class VoiceLeaders(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.cursor = Data.getCur()
@@ -136,4 +136,4 @@ class Leaders(commands.Cog):
 
 
 def setup(bot):
-    bot.add_cog(Leaders(bot))
+    bot.add_cog(VoiceLeaders(bot))
