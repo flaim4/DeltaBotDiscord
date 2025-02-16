@@ -11,7 +11,7 @@ if not hasattr(os, "work_dir"):
     os.work_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test', 'work'))
     if not os.path.isdir(os.work_dir):
         os.makedirs(os.work_dir, exist_ok=True)
-    TOKEN = "EnterToken"
+    TOKEN = "TOKEN"
     
 from util.db import Data
 import util.Resouces as res
@@ -24,7 +24,7 @@ bot = commands.Bot(
     status=disnake.Status.online,
     activity=disnake.Activity(
         type=disnake.ActivityType.watching,
-        name="DOORS 2",
+        name="Абема",
         url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
 
 )
