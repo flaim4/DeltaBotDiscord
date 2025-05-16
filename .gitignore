@@ -1,10 +1,6 @@
-balance.db
-data.db
-member.db
 .env
-./__pycache__/
-./commands/
-./cogs/__pycache__/
-./util/__pycache__/
-./__pycache__
-__pycache__
+cogs/__pycache__/*
+work/*
+util/__pycache__/*
+__pycache__/*
+env.ini

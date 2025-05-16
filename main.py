@@ -3,23 +3,28 @@ import importlib.util
 import disnake 
 import os
 import sys
-import json
-import settings
-TOKEN = None
-if not hasattr(os, "work_dir"):
-    print("Set test floader.")
-    os.work_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'test', 'work'))
-    if not os.path.isdir(os.work_dir):
-        os.makedirs(os.work_dir, exist_ok=True)
-    TOKEN = "TOKEN"
-    
+
+sys.path.insert(0, os.path.abspath('.'))
+os.work_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'work'))
+if not os.path.isdir(os.work_dir):
+    os.makedirs(os.work_dir, exist_ok=True)
+
+from util.service import ServiceRegistry
+from util.config import ConfigService
 from util.db import Data
 import util.Resouces as res
-meta = res.loadJsonObject("base")
+from multienv import EnvMannager, IniEnvProvider
 
+env : EnvMannager = EnvMannager()
+env += IniEnvProvider("env.ini")
+env.load()
+env.setGlobal()
+
+config = res.from_dict(ConfigService, res.loadYaml("base"))
+ServiceRegistry.register("config", config)
 
 bot = commands.Bot(
-    command_prefix=meta.command_prefix,
+    command_prefix=config.command_prefix,
     intents=disnake.Intents.all(),
     status=disnake.Status.online,
     activity=disnake.Activity(
@@ -37,7 +42,7 @@ async def on_ready():
 
 
 for filename in os.listdir('./cogs'):
-    if filename.endswith('.cls.py'):
+    if filename.endswith('.py') and filename != "_init_.py":
         file_path = os.path.join('./cogs', filename)
 
         spec = importlib.util.spec_from_file_location(filename[:-3], file_path)
@@ -45,23 +50,19 @@ for filename in os.listdir('./cogs'):
         spec.loader.exec_module(module)
 
         class_dict = {name: obj for name, obj in vars(module).items() if isinstance(obj, type)}
-        if filename[:-7] in class_dict:
-            class_dict[filename[:-7]](bot)
+        if filename[:-3] in class_dict:
+            cls = class_dict[filename[:-3]]
+            if cls.id in config.cogs and config.cogs[cls.id].enable:
+                obj = cls(bot)
+                ServiceRegistry.register(cls.id, obj)
+                print(cls.id, "enable")
+            else:
+                print(cls.id, "disable")
             continue
-
-    elif filename.endswith('.py') and filename != "_init_.py":
-        module_name = f'cogs.{filename[:-3]}'
-        try:
-            importlib.import_module(module_name)
-            bot.load_extension(module_name)
-        except Exception as e:
-            print(f"Не удалось загрузить {module_name}: {e}")
 
 if __name__ == "__main__":
     to = "test"
     for i in range(len(sys.argv)):
         if sys.argv[i] == "-p":
             to = sys.argv[i+1]
-    if TOKEN == None:
-        TOKEN = f"{os.env_provider:Profiles:{to}}"
-    bot.run(TOKEN)
+    bot.run(f"{os.env_provider:profiles:{to}}")

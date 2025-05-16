@@ -1,18 +1,13 @@
 import disnake 
 from disnake.ext import commands
-from disnake import TextInputStyle
-import sqlite3
-import time
 import settings
-from datetime import datetime
-from disnake import colour
 from util.member import Member
 from util.balance import Balance
-
-from util.db import Data
+from util._init_ import Indelifer
 
 from disnake.interactions.application_command import ApplicationCommandInteraction
 
+@Indelifer("profile")
 class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
@@ -141,6 +136,3 @@ class Profile(commands.Cog):
     #         ProfileColor = settings.InvisibleColor
     #         embed.color = ProfileColor
     #         await inter.send(embed=embed)
-
-def setup(bot):
-    bot.add_cog(Profile(bot))

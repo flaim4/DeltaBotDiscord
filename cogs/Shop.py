@@ -6,7 +6,9 @@ from disnake.ui import Button, View
 from util.PageShop import *
 from util.balance import *
 from disnake.interactions.application_command import ApplicationCommandInteraction
+from util._init_ import Indelifer
 
+@Indelifer("shop")
 class Shop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -208,7 +210,3 @@ class BuyRoleInShop(disnake.ui.Modal, Shop):
         buttons.add_item(Button(label="Нет", custom_id="cancel_purchase", style=disnake.ButtonStyle.grey))
 
         await inter.send(embed=embed, view=buttons, ephemeral=True)
-
-
-def setup(bot):
-    bot.add_cog(Shop(bot))

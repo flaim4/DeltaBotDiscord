@@ -1,4 +1,3 @@
-import sqlite3
 import disnake
 import time
 import json

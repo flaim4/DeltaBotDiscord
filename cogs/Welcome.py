@@ -4,27 +4,31 @@ import random
 import settings
 import util.Resouces as res
 from random import Random
+from util._init_ import Indelifer
+
+from jinja2 import Template
 
 ProfileColor = settings.InvisibleColor
 random = Random(0)
 
-
+@Indelifer("welcome")
 class Welcome(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.metadata = res.loadJson("welcome")
+        self.metadata = res.loadYaml("welcome")
 
     def randomMessage(self, member: disnake.Member, channel) -> disnake.Embed:
+        member.name
         embed = disnake.Embed(
-            title=f"✨ Добро пожаловать, {member.name}! ✨",
+            title=self.metadata["title"][random.randrange(0, len(self.metadata["title"]))].format(member, channel, disnake.guild.Guild),
             description=(
-                f"{str(self.metadata['dist']["text"][random.randrange(0, len(self.metadata['dist']["text"]))]).format(member, channel, disnake.guild.Guild)}\n\n"
+                f"{str(self.metadata["text"][random.randrange(0, len(self.metadata["text"]))]).format(member, channel, disnake.guild.Guild)}\n\n"
                 "Не забудь прочитать правила и настроить профиль. 😉"
             ),
             colour=0x2b2d31
         )
         embed.set_thumbnail(url=member.display_avatar.url)
-        embed.set_image(url=self.metadata['dist']["image"][random.randrange(0, len(self.metadata['dist']["image"]))])
+        embed.set_image(url=self.metadata["image"][random.randrange(0, len(self.metadata["image"]))])
         embed.set_footer(
             text="Мы надеемся, что тебе здесь понравится!",
             icon_url=self.bot.user.display_avatar.url
@@ -33,23 +37,8 @@ class Welcome(commands.Cog):
 
     @commands.slash_command(default_member_permissions=disnake.Permissions(administrator=True))
     async def test_invite(self, inter: disnake.ApplicationCommandInteraction):
-        random_message = random.choice(self.welcome_messages).format(member_mention=inter.user.mention)
-        embed = disnake.Embed(
-            title="Добро пожаловать на сервер!",
-            description=(
-                f"{random_message}\n\n"
-                "Не забудь прочитать правила. 😉"
-            ),
-            colour=0x2b2d31
-        )
-        embed.set_thumbnail(url=inter.author.avatar.url if inter.author.avatar else inter.author.default_avatar.url)
-        embed.set_image(url=random.choice(self.gif_links))
-        embed.set_footer(
-            text="Мы надеемся, что тебе здесь понравится!",
-            icon_url=self.bot.user.display_avatar.url
-        )
 
-        await inter.response.send_message(embed=embed)
+        await inter.response.send_message(embed=self.randomMessage(inter.author, inter.channel))
 
     @commands.Cog.listener()
     async def on_member_join(self, member: disnake.Member):
@@ -63,7 +52,3 @@ class Welcome(commands.Cog):
         if channel:
             embed = self.randomMessage(member, channel)
             await channel.send(embed=embed)
-
-
-def setup(bot: commands.Bot):
-    bot.add_cog(Welcome(bot))

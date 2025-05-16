@@ -11,6 +11,7 @@ from disnake.ext.commands.context import AnyContext
 import re
 import asyncio
 import util.ErrorHelper as ErrorHelper
+from util._init_ import Indelifer
 
 lock = asyncio.Lock()
 pattern_member_ping = r"<@(\d+)>"
@@ -97,6 +98,7 @@ if js["status"] == 200:
         return [lang for lang in Tags if user_input.lower() in lang][:25]
 
 
+    @Indelifer("fun")
     class Fun(commands.Cog):
         def __init__(self, bot):
             bot.add_cog(self)

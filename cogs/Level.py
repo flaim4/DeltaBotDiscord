@@ -11,6 +11,16 @@ from typing import Dict, List, Callable, Awaitable, Tuple
 from dataclasses import dataclass
 import asyncio
 import re
+from util._init_ import Indelifer
+
+async def can_send_dm(user: disnake.User) -> bool:
+    try:
+        channel = user.dm_channel or await user.create_dm()
+        return channel is not None
+    except disnake.Forbidden:
+        return False
+    except disnake.HTTPException:
+        return False
 
 url_pattern = r'https?://(?:www\.)?[\w.-]+(?:\.[a-z]{2,})+[/\w.-]*'
 
@@ -30,7 +40,9 @@ def format_strings_in_object(obj, args):
     return obj
 
 async def LDsend(level: int, message: disnake.Message, data : SimpleNamespace) -> int:
-    print("Dsend")
+    data = copy.copy(data)
+    format_strings_in_object(data, (level, message))
+    await message.channel.send(data.content)
     return 0
 
 async def Lsend(level: int, message: disnake.Message, data : SimpleNamespace) -> int:
@@ -42,7 +54,11 @@ async def Lsend(level: int, message: disnake.Message, data : SimpleNamespace) ->
 async def LDMsend(level: int, message: disnake.Message, data : SimpleNamespace) -> int:
     data = copy.copy(data)
     format_strings_in_object(data, (level, message))
-    await message.author.send(embed=disnake.Embed.from_dict(data.__dict__))
+    allowed = await can_send_dm(message.author)
+    if allowed:
+        await message.author.send(embed=disnake.Embed.from_dict(data.__dict__))
+    else:
+        await message.channel.send(embed=disnake.Embed.from_dict(data.__dict__))
     return 0
 
 async def Lrole(level: int, message: disnake.Message, data : SimpleNamespace) -> int:
@@ -101,7 +117,7 @@ class Action:
 
 def compile() -> Tuple[List[Action], Dict[int, List[Action]]]:
     meta = res.loadJsonObject("level")
-    data : Tuple[List[Action],Dict[int, List[Action]]] = ([Action(ActionType.get("#"), SimpleNamespace())], {})
+    data : Tuple[List[Action],Dict[int, List[Action]]] = ([], {})
     for obj in meta:
         ldata = []
         for ob2 in obj.actions:
@@ -125,7 +141,7 @@ async def level_up(level: int, message: disnake.Message):
 
 
 
-
+@Indelifer("level")
 class Level(commands.Cog):
     def __init__(self, bot : commands.Bot) -> None:
         self.cur = Data.getCur()

@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<!DOCTYPE root SYSTEM "https://raw.githubusercontent.com/p2vman/ContainerHelper/refs/heads/main/aplication.dtd">
-<root version="1.0">
-    <module name="disnake" version="2.10.1" />
-    <run file="main.py"/>
-    <pip flags="--disable-pip-version-check" />
-</root>

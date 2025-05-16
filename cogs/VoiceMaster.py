@@ -3,10 +3,9 @@ from disnake.ext import commands
 from util.db import Data
 import time 
 import util.Resouces as res
-
 from disnake import TextInputStyle
-
 from disnake.interactions.application_command import ApplicationCommandInteraction
+from util._init_ import Indelifer
 
 class MyModal(disnake.ui.Modal):
     def __init__(self, channel):
@@ -30,6 +29,7 @@ class MyModal(disnake.ui.Modal):
         await self.channel.edit(user_limit=countLimit)
         await inter.send(f"Вы успешно изменили лимит на {countLimit}")
 
+@Indelifer("voicemaster")
 class VoiceMaster(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -267,5 +267,3 @@ class VoiceMaster(commands.Cog):
                 await inter.send("У тебя нет прав для изменения лимита.")
         else:
             await inter.send("Канал не найден.")
-def setup(bot):
-    bot.add_cog(VoiceMaster(bot))

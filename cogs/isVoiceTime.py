@@ -1,12 +1,11 @@
 from disnake.ext import commands
-import asyncio
 import disnake
 import time
-from util.member import Member
 from util.db import Data
 from util.balance import Balance
+from util._init_ import Indelifer
 
-
+@Indelifer("is_voice_time")
 class isVoiceTime(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -103,7 +102,3 @@ class isVoiceTime(commands.Cog):
                             Balance.addBalance(guild.id, member.id, reward)
 
         cur.close()
-
-
-def setup(bot):
-    bot.add_cog(isVoiceTime(bot))

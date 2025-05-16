@@ -1,0 +1,22 @@
+command_prefix: d!
+cogs:
+  voicemaster:
+    enable: true
+  level:
+    enable: true
+  loveprofile:
+    enable: false
+  welcome:
+    enable: true
+  is_voice_time:
+    enable: true
+  fun:
+    enable: true
+  bonus:
+    enable: true
+  leaders:
+    enable: true
+  profile:
+    enable: true
+  shop:
+    enable: true

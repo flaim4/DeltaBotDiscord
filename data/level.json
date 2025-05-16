@@ -5,15 +5,9 @@
         {
           "type": "#D",
           "data":  {
-            "title": "Level: {0}, Memberid: {1.author.id}"
+            "description": "Level: {0}, Memberid: {1.author.id}"
           }
         }
-      ]
-    },
-    {
-      "level": 2,
-      "actions": [
-        {"type": "#", "data":  {}}
       ]
     }
   ]
