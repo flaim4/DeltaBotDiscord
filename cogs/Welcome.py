@@ -6,8 +6,6 @@ import util.Resouces as res
 from random import Random
 from util._init_ import Indelifer
 
-from jinja2 import Template
-
 ProfileColor = settings.InvisibleColor
 random = Random(0)
 

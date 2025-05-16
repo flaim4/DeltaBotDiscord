@@ -9,6 +9,7 @@ Cython==3.0.12
 disnake==2.10.1
 frozenlist==1.6.0
 idna==3.10
+Jinja2==3.1.6
 llvmlite==0.44.0
 Mako==1.3.10.dev0
 Markdown==3.5.2
@@ -18,10 +19,12 @@ multidict==6.4.3
 numba==0.61.2
 numpy==2.2.5
 packaging==25.0
+pillow==11.2.1
 propcache==0.3.1
 pycairo==1.27.0
 Pygments==2.19.1
 PyGObject==3.50.0
+PyYAML==6.0.2
 requests==2.32.3
 setuptools==80.3.1
 six==1.17.0
