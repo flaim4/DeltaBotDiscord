@@ -20,3 +20,5 @@ cogs:
     enable: true
   shop:
     enable: true
+  tikets:
+    enable: true

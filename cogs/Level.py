@@ -12,6 +12,7 @@ from dataclasses import dataclass
 import asyncio
 import re
 from util._init_ import Indelifer
+from util.event import subscribe, OnMessage
 
 async def can_send_dm(user: disnake.User) -> bool:
     try:
@@ -149,8 +150,9 @@ class Level(commands.Cog):
         self.bot.add_cog(self)
         Level.logger.info("init")
 
-    @commands.Cog.listener(disnake.Event.message)
-    async def on_message(self, message : disnake.Message):
+    @subscribe(OnMessage)
+    async def on_message(self, event : OnMessage):
+        message = event.message
         if (message.author.id == self.bot.user.id): return
         await util.Reaction.addReaction(message=message)
         async with lock:

@@ -32,6 +32,7 @@ from util.config import ConfigService
 from util.db import Data
 import util.Resouces as res
 from multienv import EnvMannager, IniEnvProvider
+from util.event import bus, OnReady, auto_subscribe, OnMessage
 
 env : EnvMannager = EnvMannager()
 env += IniEnvProvider("env.ini")
@@ -55,9 +56,16 @@ cur = Data.getCur()
 
 @bot.event
 async def on_ready():
+    await bus.post(OnReady(bot))
     logging.info('Successful login in: ' + str(bot.user))
 
-
+@bot.event
+async def on_message(message: disnake.Message):
+    if message.author.bot:
+        return
+    await bus.post(OnMessage(bot, message))
+    await bot.process_commands(message)
+    
 for filename in os.listdir('./cogs'):
     if filename.endswith('.py') and filename != "_init_.py":
         file_path = os.path.join('./cogs', filename)
@@ -72,7 +80,9 @@ for filename in os.listdir('./cogs'):
             cls.logger = logging.getLogger(filename[:-3])
             if cls.id in config.cogs and config.cogs[cls.id].enable:
                 obj = cls(bot)
+                auto_subscribe(obj, bus)
                 ServiceRegistry.register(cls.id, obj)
+                
 
 if __name__ == "__main__":
     to = "test"
