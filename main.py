@@ -3,6 +3,24 @@ import importlib.util
 import disnake 
 import os
 import sys
+import logging
+
+formatter = logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    "%H:%M:%S"
+)
+
+a = logging.FileHandler("app.log")
+a.setFormatter(formatter)
+b = logging.StreamHandler()
+b.setFormatter(formatter)
+
+logging.basicConfig(
+    level=logging.INFO,
+    handlers=[
+        a, b
+    ]
+)
 
 sys.path.insert(0, os.path.abspath('.'))
 os.work_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), 'work'))
@@ -31,14 +49,13 @@ bot = commands.Bot(
         type=disnake.ActivityType.watching,
         name="Абема",
         url="https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-
 )
 
 cur = Data.getCur()
 
 @bot.event
 async def on_ready():
-    print('Successful login in:', bot.user)
+    logging.info('Successful login in: ' + str(bot.user))
 
 
 for filename in os.listdir('./cogs'):
@@ -52,12 +69,13 @@ for filename in os.listdir('./cogs'):
         class_dict = {name: obj for name, obj in vars(module).items() if isinstance(obj, type)}
         if filename[:-3] in class_dict:
             cls = class_dict[filename[:-3]]
+            cls.logger = logging.getLogger(filename[:-3])
             if cls.id in config.cogs and config.cogs[cls.id].enable:
                 obj = cls(bot)
                 ServiceRegistry.register(cls.id, obj)
-                print(cls.id, "enable")
+                logging.info(str(cls.id) + " enable")
             else:
-                print(cls.id, "disable")
+                logging.info(str(cls.id) + " disable")
             continue
 
 if __name__ == "__main__":

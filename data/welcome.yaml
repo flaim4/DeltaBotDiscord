@@ -1,5 +1,5 @@
 title:
-  - ':sparkles: Добро пожаловать, {0.name}! :sparkles:'
+  - ':sparkles: Добро пожаловать, {member.name}! :sparkles:'
 image:
   - 'https://media1.tenor.com/m/4HvAJpQ5s7wAAAAd/the-rock-murder-drones.gif"'
   - 'https://media1.tenor.com/m/gfeo4ibN2LsAAAAC/taiga-toradora.gif"'
@@ -13,14 +13,14 @@ image:
   - 'https://media1.tenor.com/m/U2HSnN8eFnsAAAAd/yay-loli.gif"'
 text:
   - >-
-    Привет, {0.mention}! Мы так рады, что ты с нами!  Загляни в каналы и начни
+    Привет, {member.mention}! Мы так рады, что ты с нами!  Загляни в каналы и начни
     общаться! 
   - >-
-    Добро пожаловать, {0.mention}!  Ты попал в замечательное место! Наслаждайся
+    Добро пожаловать, {member.mention}!  Ты попал в замечательное место! Наслаждайся
     общением и дружбой! 
   - >-
-    Эй, {0.mention}, добро пожаловать на сервер!  Мы уверены, что тебе тут
+    Эй, {member.mention}, добро пожаловать на сервер!  Мы уверены, что тебе тут
     понравится! 
   - >-
-    Привет, {0.mention}! Мы рады, что ты с нами!  Присоединяйся к обсуждениям и
+    Привет, {member.mention}! Мы рады, что ты с нами!  Присоединяйся к обсуждениям и
     не забывай веселиться! 

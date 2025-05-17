@@ -15,12 +15,12 @@ class Welcome(commands.Cog):
         self.bot = bot
         self.metadata = res.loadYaml("welcome")
 
-    def randomMessage(self, member: disnake.Member, channel) -> disnake.Embed:
+    def randomMessage(self, member: disnake.Member, channel: disnake.channel.TextChannel) -> disnake.Embed:
         member.name
         embed = disnake.Embed(
-            title=self.metadata["title"][random.randrange(0, len(self.metadata["title"]))].format(member, channel, disnake.guild.Guild),
+            title=self.metadata["title"][random.randrange(0, len(self.metadata["title"]))].format(member=member, channel=channel, gulid=channel.guild),
             description=(
-                f"{str(self.metadata["text"][random.randrange(0, len(self.metadata["text"]))]).format(member, channel, disnake.guild.Guild)}\n\n"
+                f"{str(self.metadata["text"][random.randrange(0, len(self.metadata["text"]))]).format(member=member, channel=channel, gulid=channel.guild)}\n\n"
                 "Не забудь прочитать правила и настроить профиль. 😉"
             ),
             colour=0x2b2d31

@@ -4,3 +4,5 @@ work/*
 util/__pycache__/*
 __pycache__/*
 env.ini
+venv/*
+app.log

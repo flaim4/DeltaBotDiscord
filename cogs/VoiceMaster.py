@@ -52,7 +52,7 @@ class VoiceMaster(commands.Cog):
         category = disnake.utils.get(guild.categories, id=self.metadata.category)
 
         if before.channel is None and after.channel is not None:
-            print(self.heshmap)
+            VoiceMaster.logger.debug(str(self.heshmap))
 
             if after.channel.id == self.metadata.channel: 
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
@@ -66,13 +66,13 @@ class VoiceMaster(commands.Cog):
                 await member.move_to(channel=channel)
 
         elif before.channel is not None and after.channel is None:
-            print(self.heshmap)
+            VoiceMaster.logger.debug(str(self.heshmap))
  
             if before.channel.id in self.heshmap:
                 await self.updateCountMemberInVoice(guild, before.channel)
 
         elif before.channel != after.channel:
-            print(self.heshmap)
+            VoiceMaster.logger.debug(str(self.heshmap))
 
             if after.channel.id == self.metadata.channel: 
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
