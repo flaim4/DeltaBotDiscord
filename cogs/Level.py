@@ -147,6 +147,7 @@ class Level(commands.Cog):
         self.cur = Data.getCur()
         self.bot = bot
         self.bot.add_cog(self)
+        Level.logger.info("init")
 
     @commands.Cog.listener(disnake.Event.message)
     async def on_message(self, message : disnake.Message):

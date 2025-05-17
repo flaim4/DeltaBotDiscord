@@ -11,6 +11,8 @@ from disnake.interactions.application_command import ApplicationCommandInteracti
 class Profile(commands.Cog):
     def __init__(self, bot):
         self.bot: commands.Bot = bot
+        bot.add_cog(self)
+        Profile.logger.info("init")
 
     @commands.slash_command(description="Посмотреть профиль")
     async def profile(self, ctx, member: disnake.Member = None):

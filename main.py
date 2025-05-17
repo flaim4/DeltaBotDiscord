@@ -73,10 +73,6 @@ for filename in os.listdir('./cogs'):
             if cls.id in config.cogs and config.cogs[cls.id].enable:
                 obj = cls(bot)
                 ServiceRegistry.register(cls.id, obj)
-                logging.info(str(cls.id) + " enable")
-            else:
-                logging.info(str(cls.id) + " disable")
-            continue
 
 if __name__ == "__main__":
     to = "test"

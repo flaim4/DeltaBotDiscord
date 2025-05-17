@@ -13,7 +13,9 @@ random = Random(0)
 class Welcome(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
+        bot.add_cog(self)
         self.metadata = res.loadYaml("welcome")
+        Welcome.logger.info("init")
 
     def randomMessage(self, member: disnake.Member, channel: disnake.channel.TextChannel) -> disnake.Embed:
         member.name

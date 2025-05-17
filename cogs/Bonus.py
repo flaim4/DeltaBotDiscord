@@ -32,6 +32,11 @@ vals = np.empty(0)
 
 @Indelifer("bonus")
 class Bonus(commands.Cog):
+    def __init__(self, bot):
+        self.bot = bot
+        bot.add_cog(self)
+        Bonus.logger.info("init")
+        
     @commands.slash_command()
     async def bonus(self, ctx: ApplicationCommandInteraction):
         async with lock:

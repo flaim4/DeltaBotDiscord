@@ -12,9 +12,11 @@ from util._init_ import Indelifer
 class Shop(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.add_cog(self)
         self.page = PageShop()
         self.manager = None
         self.server_id = None
+        Shop.logger.info("init")
 
     @commands.slash_command()
     async def shop(self, ctx: ApplicationCommandInteraction):

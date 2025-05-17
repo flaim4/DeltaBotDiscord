@@ -10,7 +10,9 @@ ProfileColor = settings.InvisibleColor
 class LoveProfile(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.add_cog(self)
         self.hesmap = {}
+        LoveProfile.logger.info("init")
 
 
     @commands.slash_command()

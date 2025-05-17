@@ -103,6 +103,7 @@ if js["status"] == 200:
         def __init__(self, bot):
             bot.add_cog(self)
             self.bot = bot
+            Fun.logger.info("init")
 
         @commands.slash_command()
         async def fun(self, ctx):

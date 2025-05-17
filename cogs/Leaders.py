@@ -104,10 +104,12 @@ class LeaderTypeEnum(enum.Enum):
 class Leaders(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.add_cog(self)
         self.cursor = Data.getCur()
         self.ProfileColor = settings.InvisibleColor
         self.types : list[LeaderType] = []
         self.types.append(LeaderVoice(self))
+        Leaders.logger.info("init")
 
 
     @commands.slash_command()

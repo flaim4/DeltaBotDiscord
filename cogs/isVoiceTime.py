@@ -9,7 +9,9 @@ from util._init_ import Indelifer
 class isVoiceTime(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.add_cog(self)
         self.heshmap = {}
+        isVoiceTime.logger.info("init")
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):

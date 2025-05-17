@@ -22,6 +22,7 @@ class MyModal(disnake.ui.Modal):
             ),
         ]
         super().__init__(title="VoiceMaster", components=components)
+        MyModal.logger.info("init")
 
     async def callback(self, inter: disnake.ModalInteraction):
             
@@ -33,6 +34,7 @@ class MyModal(disnake.ui.Modal):
 class VoiceMaster(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.add_cog(self)
         self.cur = Data.getCur()
         self.heshmap = {}
         self.metadata = res.loadJsonObject("voicemaster")
