@@ -9,7 +9,7 @@ import time
 import json
 from numba import njit
 import numpy as np
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 @njit
 def random(prev_vals, window_size):
@@ -31,12 +31,7 @@ def random(prev_vals, window_size):
 vals = np.empty(0)
 
 @Indelifer("bonus")
-class Bonus(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
-        Bonus.logger.info("init")
-        
+class Bonus(CogBase):
     @commands.slash_command()
     async def bonus(self, ctx: ApplicationCommandInteraction):
         async with lock:

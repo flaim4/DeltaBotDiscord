@@ -4,23 +4,33 @@ import disnake
 from disnake.ext import commands
 import random
 from util.db import Data
-import util.Reaction
 import util.Resouces as res
 from types import SimpleNamespace
 from typing import Dict, List, Callable, Awaitable, Tuple
 from dataclasses import dataclass
 import asyncio
 import re
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 from util.event import subscribe, OnMessage
+from typing import Union
+
+_failed_dm_users: set[int] = set()
 
 async def can_send_dm(user: disnake.User) -> bool:
+    if user.id in _failed_dm_users:
+        return False
+
     try:
         channel = user.dm_channel or await user.create_dm()
-        return channel is not None
+        await channel.send(content="\u200b", delete_after=0.1)
+        return True
     except disnake.Forbidden:
+        _failed_dm_users.add(user.id)
+        Level.logger.info(str(_failed_dm_users))
         return False
-    except disnake.HTTPException:
+    except Exception:
+        _failed_dm_users.add(user.id)
+        Level.logger.info(str(_failed_dm_users))
         return False
 
 url_pattern = r'https?://(?:www\.)?[\w.-]+(?:\.[a-z]{2,})+[/\w.-]*'
@@ -57,9 +67,13 @@ async def LDMsend(level: int, message: disnake.Message, data : SimpleNamespace) 
     format_strings_in_object(data, (level, message))
     allowed = await can_send_dm(message.author)
     if allowed:
-        await message.author.send(embed=disnake.Embed.from_dict(data.__dict__))
-    else:
-        await message.channel.send(embed=disnake.Embed.from_dict(data.__dict__))
+        try:
+            await message.author.send(embed=disnake.Embed.from_dict(data.__dict__))
+        except:
+            pass
+        finally:
+            return 0
+    await message.channel.send(embed=disnake.Embed.from_dict(data.__dict__))
     return 0
 
 async def Lrole(level: int, message: disnake.Message, data : SimpleNamespace) -> int:
@@ -132,31 +146,33 @@ async def level_up(level: int, message: disnake.Message):
     actions : List[Action] = data[1].get(level, data[0])
     if not (actions is None):
         for action in actions:
-            result : int = (await (ActionType.get_function(action.type))(level, message, action.data))
-            if result == 0:
+            result = 2
+            try:
+                result : int = (await (ActionType.get_function(action.type))(level, message, action.data))
+            except:
                 continue
-            elif result == 1:
-                print(f"Level : {level}, Action : {action.type} {action.data} | Missing argumets")
-            elif result == 2:
-                print(f"Level : {level}, Action : {action.type} {action.data} | Missing Fatal")
+            finally:
+                if result == 0:
+                    continue
+                elif result == 1:
+                    print(f"Level : {level}, Action : {action.type} {action.data} | Missing argumets")
+                elif result == 2:
+                    print(f"Level : {level}, Action : {action.type} {action.data} | Fatal")
 
 
 
 @Indelifer("level")
-class Level(commands.Cog):
-    def __init__(self, bot : commands.Bot) -> None:
+class Level(CogBase):
+    def init(self):
         self.cur = Data.getCur()
-        self.bot = bot
-        self.bot.add_cog(self)
-        Level.logger.info("init")
 
     @subscribe(OnMessage)
     async def on_message(self, event : OnMessage):
         message = event.message
         if (message.author.id == self.bot.user.id): return
-        await util.Reaction.addReaction(message=message)
         async with lock:
-            await self.add_xp(server_id=message.guild.id, user_id=message.author.id, xp=self.calculate_xp(message=message.content), msg=message)
+            if message.guild:
+                await self.add_xp(server_id=message.guild.id, user_id=message.author.id, xp=self.calculate_xp(message=message.content), msg=message)
         
     def calculate_xp(self, message):
         message = re.sub(url_pattern, '', message)

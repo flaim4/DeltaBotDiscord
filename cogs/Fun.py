@@ -11,7 +11,7 @@ from disnake.ext.commands.context import AnyContext
 import re
 import asyncio
 import util.ErrorHelper as ErrorHelper
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 lock = asyncio.Lock()
 pattern_member_ping = r"<@(\d+)>"
@@ -99,12 +99,7 @@ if js["status"] == 200:
 
 
     @Indelifer("fun")
-    class Fun(commands.Cog):
-        def __init__(self, bot):
-            bot.add_cog(self)
-            self.bot = bot
-            Fun.logger.info("init")
-
+    class Fun(CogBase):
         @commands.slash_command()
         async def fun(self, ctx):
             pass

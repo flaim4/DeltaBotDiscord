@@ -5,7 +5,7 @@ import time
 import util.Resouces as res
 from disnake import TextInputStyle
 from disnake.interactions.application_command import ApplicationCommandInteraction
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 class MyModal(disnake.ui.Modal):
     def __init__(self, channel):
@@ -31,10 +31,8 @@ class MyModal(disnake.ui.Modal):
         await inter.send(f"Вы успешно изменили лимит на {countLimit}")
 
 @Indelifer("voicemaster")
-class VoiceMaster(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
+class VoiceMaster(CogBase):
+    def init(self):
         self.cur = Data.getCur()
         self.heshmap = {}
         self.metadata = res.loadJsonObject("voicemaster")
@@ -54,7 +52,7 @@ class VoiceMaster(commands.Cog):
         category = disnake.utils.get(guild.categories, id=self.metadata.category)
 
         if before.channel is None and after.channel is not None:
-            VoiceMaster.logger.debug(str(self.heshmap))
+            self.logger.debug(str(self.heshmap))
 
             if after.channel.id == self.metadata.channel: 
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)
@@ -68,13 +66,13 @@ class VoiceMaster(commands.Cog):
                 await member.move_to(channel=channel)
 
         elif before.channel is not None and after.channel is None:
-            VoiceMaster.logger.debug(str(self.heshmap))
+            self.logger.debug(str(self.heshmap))
  
             if before.channel.id in self.heshmap:
                 await self.updateCountMemberInVoice(guild, before.channel)
 
         elif before.channel != after.channel:
-            VoiceMaster.logger.debug(str(self.heshmap))
+            self.logger.debug(str(self.heshmap))
 
             if after.channel.id == self.metadata.channel: 
                 channel: disnake.VoiceChannel = await guild.create_voice_channel(name=member.name, category=category)

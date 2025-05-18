@@ -4,18 +4,15 @@ import random
 import settings
 import util.Resouces as res
 from random import Random
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 ProfileColor = settings.InvisibleColor
 random = Random(0)
 
 @Indelifer("welcome")
-class Welcome(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
-        self.bot = bot
-        bot.add_cog(self)
+class Welcome(CogBase):
+    def init(self):
         self.metadata = res.loadYaml("welcome")
-        Welcome.logger.info("init")
 
     def randomMessage(self, member: disnake.Member, channel: disnake.channel.TextChannel) -> disnake.Embed:
         member.name

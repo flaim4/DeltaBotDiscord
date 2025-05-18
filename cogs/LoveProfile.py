@@ -2,23 +2,19 @@ import disnake
 from disnake.ext import commands  
 from util.member import Member
 import settings
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 ProfileColor = settings.InvisibleColor
 
 @Indelifer("loveprofile")
-class LoveProfile(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
+class LoveProfile(CogBase):
+    def init(self):
         self.hesmap = {}
-        LoveProfile.logger.info("init")
-
 
     @commands.slash_command()
     async def marry(self, ctx, member: disnake.Member):
         if (member.id != ctx.author.id):
-            embed = disnake.Embed(description=f"### Заключение брака\n <@{member.id}>, Вы согласны вступить в брак с <@{ctx.author.id}>?", color=ProfileColor)
+            embed = disnake.Embed(description=f"### Заключение брака\n {member.mention}, Вы согласны вступить в брак с {ctx.author.mention}?", color=ProfileColor)
             components = [
                 disnake.ui.Button(label="Да", style=disnake.ButtonStyle.gray, custom_id="yes"),
                 disnake.ui.Button(label="Нет", style=disnake.ButtonStyle.gray, custom_id="no")

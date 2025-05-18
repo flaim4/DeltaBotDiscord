@@ -5,7 +5,7 @@ import enum
 from util.member import Member
 from disnake.ext import commands
 import settings
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 class LeaderType:
     def __init__(self, leaders):
@@ -101,15 +101,12 @@ class LeaderTypeEnum(enum.Enum):
         return None
 
 @Indelifer("leaders")
-class Leaders(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
+class Leaders(CogBase):
+    def init(self):
         self.cursor = Data.getCur()
         self.ProfileColor = settings.InvisibleColor
         self.types : list[LeaderType] = []
         self.types.append(LeaderVoice(self))
-        Leaders.logger.info("init")
 
 
     @commands.slash_command()

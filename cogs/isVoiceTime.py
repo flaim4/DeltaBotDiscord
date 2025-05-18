@@ -3,15 +3,12 @@ import disnake
 import time
 from util.db import Data
 from util.balance import Balance
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 @Indelifer("is_voice_time")
-class isVoiceTime(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
+class isVoiceTime(CogBase):  
+    def init(self):
         self.heshmap = {}
-        isVoiceTime.logger.info("init")
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):

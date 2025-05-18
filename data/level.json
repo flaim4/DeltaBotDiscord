@@ -5,7 +5,7 @@
         {
           "type": "#D",
           "data":  {
-            "description": "Level: {0}, Memberid: {1.author.id}"
+            "description": "{1.author.mention} level up : {0}"
           }
         }
       ]

@@ -6,17 +6,14 @@ from disnake.ui import Button, View
 from util.PageShop import *
 from util.balance import *
 from disnake.interactions.application_command import ApplicationCommandInteraction
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 @Indelifer("shop")
-class Shop(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
+class Shop(CogBase):   
+    def init(self):
         self.page = PageShop()
         self.manager = None
         self.server_id = None
-        Shop.logger.info("init")
 
     @commands.slash_command()
     async def shop(self, ctx: ApplicationCommandInteraction):

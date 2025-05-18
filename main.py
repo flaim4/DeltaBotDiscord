@@ -33,6 +33,9 @@ from util.db import Data
 import util.Resouces as res
 from multienv import EnvMannager, IniEnvProvider
 from util.event import bus, OnReady, auto_subscribe, OnMessage
+import util.Reaction as R
+
+R.__spec__
 
 env : EnvMannager = EnvMannager()
 env += IniEnvProvider("env.ini")
@@ -58,6 +61,7 @@ cur = Data.getCur()
 async def on_ready():
     await bus.post(OnReady(bot))
     logging.info('Successful login in: ' + str(bot.user))
+    logging.info('guilds: ' + str(len(bot.guilds)))
 
 @bot.event
 async def on_message(message: disnake.Message):
@@ -77,9 +81,8 @@ for filename in os.listdir('./cogs'):
         class_dict = {name: obj for name, obj in vars(module).items() if isinstance(obj, type)}
         if filename[:-3] in class_dict:
             cls = class_dict[filename[:-3]]
-            cls.logger = logging.getLogger(filename[:-3])
             if cls.id in config.cogs and config.cogs[cls.id].enable:
-                obj = cls(bot)
+                obj = cls(bot, filename[:-3])
                 auto_subscribe(obj, bus)
                 ServiceRegistry.register(cls.id, obj)
                 

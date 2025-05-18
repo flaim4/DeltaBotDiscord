@@ -1,6 +1,6 @@
 import disnake
 from disnake.ext import commands
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 from util.db import Data
 from disnake.interactions.application_command import ApplicationCommandInteraction
 from disnake.ui import View, button as Button
@@ -30,10 +30,8 @@ class TicketButton(View):
             await ctx.send("Эта кнопка работает только внутри тикет-треда.")
 
 @Indelifer("tikets")
-class Tikets(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-        bot.add_cog(self)
+class Tikets(CogBase):
+    def init(self):
         self.cur = Data.getCur()
         
         self.cur.execute('''CREATE TABLE IF NOT EXISTS tickets (
@@ -49,49 +47,52 @@ class Tikets(commands.Cog):
         self.support_role_id = 1373322547189514322
         
         self.cfg = loadYamlObject("tiket")
-        
-        Tikets.logger.info("init")
-        
+    
     @subscribe(OnReady)
-    def on_ready(self, event : OnReady):
+    async def on_ready(self, event : OnReady):
         self.view = TicketButton()
         event.bot.add_view(self.view)
+        
+        await event.bot.get_channel(self.cfg.chanel).send(embed=disnake.Embed(description="This channel is for logs, not dialogues. Observe silently."))
     
-    @commands.slash_command(name="create_ticket")
-    async def c_ticket(self, ctx: ApplicationCommandInteraction, reason : str = "none"):
-        user = ctx.user
-        guild = ctx.guild
+    async def create_ticket_internal(self, user: disnake.Member, guild: disnake.Guild, reason: str = "none") -> disnake.Thread:
         channel = guild.get_channel(self.cfg.chanel)
         support_role = guild.get_role(self.cfg.support.role)
-        
+
         self.cur.execute("SELECT thread_id FROM tickets WHERE user_id = ? AND status = 'open'", (user.id,))
         if self.cur.fetchone():
-            await ctx.response.send_message("У вас уже есть открытый тикет.", ephemeral=True)
-            return
-        
+            raise Exception("already_open")
+
         thread = await channel.create_thread(
             name=f"ticket-{user.name}",
             type=disnake.ChannelType.private_thread,
             reason=reason
         )
-        
+
         await channel.send(content=f"{thread.mention}")
-        
-        
         await thread.add_user(user)
+
         for member in support_role.members:
             try:
                 await thread.add_user(member)
             except disnake.Forbidden:
                 pass
-        
+
         self.cur.execute("INSERT INTO tickets (user_id, thread_id) VALUES (?, ?)", (user.id, thread.id))
         Data.commit()
-    
-        
-        
-        ebd = disnake.Embed(description=f"{user.mention}, ваш тикет создан.{' Опишите проблему.' if reason == 'none' else f'\nReason:```{reason}```'}")
 
+        ebd = disnake.Embed(description=f"{user.mention}, ваш тикет создан.{' Опишите проблему.' if reason == 'none' else f'\nReason:```{reason}```'}")
         await thread.send(content=f"{support_role.mention}", embed=ebd, view=self.view)
-        await ctx.response.send_message(f"Тикет создан: {thread.mention}", ephemeral=True)
-        
+
+        return thread
+    
+    @commands.slash_command(name="create_ticket")
+    async def c_ticket(self, ctx: disnake.ApplicationCommandInteraction, reason: str = "none"):
+        try:
+            thread = await self.create_ticket_internal(ctx.user, ctx.guild, reason)
+            await ctx.response.send_message(f"Тикет создан: {thread.mention}", ephemeral=True)
+        except Exception as e:
+            if str(e) == "already_open":
+                await ctx.response.send_message("У вас уже есть открытый тикет.", ephemeral=True)
+            else:
+                raise

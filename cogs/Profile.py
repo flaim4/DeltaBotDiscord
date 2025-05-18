@@ -3,17 +3,12 @@ from disnake.ext import commands
 import settings
 from util.member import Member
 from util.balance import Balance
-from util._init_ import Indelifer
+from util._init_ import Indelifer, CogBase
 
 from disnake.interactions.application_command import ApplicationCommandInteraction
 
 @Indelifer("profile")
-class Profile(commands.Cog):
-    def __init__(self, bot):
-        self.bot: commands.Bot = bot
-        bot.add_cog(self)
-        Profile.logger.info("init")
-
+class Profile(CogBase):
     @commands.slash_command(description="Посмотреть профиль")
     async def profile(self, ctx, member: disnake.Member = None):
         
@@ -106,7 +101,7 @@ class Profile(commands.Cog):
         Balance.addBalance(ctx.guild.id, member.id, count)
         await ctx.send(f"Вы успешно перевели деньги пользователю <@{member.id}> {count} монет!")
 
-        embed = disnake.Embed(description=f"<@{ctx.author.id}> перевел <@{member.id}> <@{count}> монет", timestamp=disnake.utils.utcnow())
+        embed = disnake.Embed(description=f"<@{ctx.author.id}> перевел <@{member.id}> `{count}` монет", timestamp=disnake.utils.utcnow())
 
         embed.set_author(name=f"{ctx.author.name}",
                          icon_url=f"{ctx.author.display_avatar.url}")
