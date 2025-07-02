@@ -216,7 +216,8 @@ class VoiceMaster(CogBase):
         if idChannel in self.heshmap:
             if (self.heshmap[idChannel]["owner"] == inter.author.id):
                 await channel.set_permissions(member, overwrite=disnake.PermissionOverwrite(connect=False))
-                await member.edit(voice_channel=None)
+                if member.voice and member.voice.channel and member.voice.channel.id == idChannel:
+                    await member.edit(voice_channel=None)
             else:
                 await inter.send("У тебя нет прав.")
         else:
