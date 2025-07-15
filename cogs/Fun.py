@@ -34,16 +34,14 @@ chage_nekosia = os.path.join(os.work_dir, "nekosia.tags.bak")
 if os.path.exists(chage_nekosia):
     js = json.load(open(chage_nekosia, encoding="utf-8"))
 else:
-    req = requests.get("https://api.nekosia.cat/api/v1/tags")
-    js = req.json()
+    js = requests.get("https://api.nekosia.cat/api/v1/tags").json()
     json.dump(js, open(chage_nekosia, encoding="utf-8", mode="w"))
 
 chage_otakugifs = os.path.join(os.work_dir, "otakugifs.tags.bak")
 if os.path.exists(chage_otakugifs):
     js2 = json.load(open(chage_otakugifs, encoding="utf-8"))
 else:
-    req = requests.get("https://api.otakugifs.xyz/gif/allreactions")
-    js2 = req.json()
+    js2 = requests.get("https://api.otakugifs.xyz/gif/allreactions").json()
     json.dump(js2, open(chage_otakugifs, encoding="utf-8", mode="w"))
 
 

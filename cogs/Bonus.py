@@ -7,39 +7,25 @@ from disnake.interactions.application_command import ApplicationCommandInteracti
 import random
 import time
 import json
-from numba import njit
-import numpy as np
 from util._init_ import Indelifer, CogBase
 
-@njit
-def random(prev_vals, window_size):
-    r = np.random.randint(1, 500)
-    n = len(prev_vals)
-    if n < window_size:
-        vals = np.empty(n + 1, dtype=np.float64)
-        for i in range(n):
-            vals[i] = prev_vals[i]
-        vals[-1] = r
-    else:
-        vals = np.empty(window_size, dtype=np.float64)
-        for i in range(1, window_size):
-            vals[i - 1] = prev_vals[i]
-        vals[-1] = r
-    return vals, np.mean(vals)
-
-
-vals = np.empty(0)
 
 @Indelifer("bonus")
 class Bonus(CogBase):
+
     @commands.slash_command()
     async def bonus(self, ctx: ApplicationCommandInteraction):
-        async with lock:
+        async with Data.timeOut as timeout:
             global vals
             server_id = ctx.guild.id
             user_id = ctx.author.id
+
+            result = timeout.execute(
+                "SELECT json FROM TimeOut WHERE server_id = ? AND user_id = ?",
+                (server_id, user_id)
+            ).fetchone()
+            timeout_info = result[0] if result else None
             
-            timeout_info = TimeOut.getTimeOut(server_id, user_id)
             current_time = time.time()
             
             if not (timeout_info == None):
@@ -53,8 +39,14 @@ class Bonus(CogBase):
                     await ctx.send(f"Вы уже получили бонус. Попробуйте снова через {hours}ч {minutes}м {seconds}с.")
                     return
             
-            vals, bonus_amount = random(vals,window_size=5)
-            Balance.addBalance(server_id, user_id, bonus_amount)
-            
-            TimeOut.updateTimeOut(server_id, user_id, json.dumps({"bonus": current_time}))
+            bonus_amount = random.randint(50, 500)
+            await Balance.addBalance(server_id, user_id, bonus_amount)
+
+            timeout.execute(
+                """INSERT INTO TimeOut (server_id, user_id, json)
+                    VALUES (?, ?, ?)
+                    ON CONFLICT(server_id, user_id) DO UPDATE SET json = excluded.json""",
+                (server_id, user_id, json.dumps({"bonus": current_time}))
+            )
+            await timeout.commit()
             await ctx.send(f"Поздравляем! Вы получили бонус: {bonus_amount} монет.")

@@ -3,49 +3,49 @@ import time
 import json
 
 from util.db import Data
-from util.db import DBWapper
 
-class Member(DBWapper):
-    
+class Member:
     @staticmethod
-    def getCountMessage(server_id, user_id):
-        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
-        row = Member.cur.fetchone()
-        if row:
-            return row[2]
-        else: 
-            Member.execute("""INSERT INTO Users (server_id, user_id, message) VALUES (?, ?, ?)""",
-                            (server_id, user_id, 0))
-            Data.commit()
-            return 0
-
+    async def getCountMessage(server_id, user_id):
+        async with Data.users as users:
+            users.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+            row = users.fetchone()
+            if row:
+                return row[2]
+            else: 
+                users.execute("""INSERT INTO Users (server_id, user_id, message) VALUES (?, ?, ?)""",
+                                              (server_id, user_id, 0))
+                await users.commit()
+                return 0
 
     @staticmethod
-    def getWarns(server_id, user_id):
-        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
-        row = Member.cur.fetchone()
-        if row:
-            return row[4]
-        else: 
-            Member.execute("""INSERT INTO Users (server_id, user_id, warns) VALUES (?, ?, ?)""",
-                            (server_id, user_id, 0))
-            Data.commit()
-            return 0
+    async def getWarns(server_id, user_id):
+        async with Data.users as users:
+            users.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+            row = users.fetchone()
+            if row:
+                return row[4]
+            else: 
+                users.execute("""INSERT INTO Users (server_id, user_id, warns) VALUES (?, ?, ?)""",
+                                              (server_id, user_id, 0))
+                await users.commit()
+                return 0
 
     @staticmethod
-    def getCountSecondVoice(server_id, user_id):
-        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
-        row = Member.cur.fetchone()
-        if row:
-            return row[3]
-        else: 
-            Member.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
-                            (server_id, user_id, 0))
-            Data.commit()
-            return 0
+    async def getCountSecondVoice(server_id, user_id):
+        async with Data.users as users:
+            users.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+            row = users.fetchone()
+            if row:
+                return row[3]
+            else: 
+                users.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
+                                              (server_id, user_id, 0))
+                await users.commit()
+                return 0
         
     @staticmethod
-    def getLoveMember(server_id, author_id):
+    async def getLoveMember(server_id, author_id):
         Member.execute("SELECT * FROM Love WHERE server_id = ? AND user_id = ?", (server_id, author_id))
         row = Member.cur.fetchone()
         if row:
@@ -110,25 +110,27 @@ class Member(DBWapper):
         return days, hours, minutes, seconds
     
     @staticmethod
-    def getLevelMember(guild: disnake.Guild, member: disnake.Member):
-        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (guild.id, member.id))
-        row = Member.cur.fetchone()
-        if row:
-            return row[5]
-        else: 
-            Member.execute("""INSERT INTO Users (server_id, user_id, lvl) VALUES (?, ?, ?)""",
-                            (guild.id, member.id, 0))
-            Data.commit()
-            return 0
+    async def getLevelMember(guild: disnake.Guild, member: disnake.Member):
+        async with Data.users as users:
+            users.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (guild.id, member.id))
+            row = users.fetchone()
+            if row:
+                return row[5]
+            else: 
+                users.execute("""INSERT INTO Users (server_id, user_id, lvl) VALUES (?, ?, ?)""",
+                                          (guild.id, member.id, 0))
+                await users.commit()
+                return 0
         
     @staticmethod
-    def getXpMember(guild: disnake.Guild, member: disnake.Member):
-        Member.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (guild.id, member.id))
-        row = Member.cur.fetchone()
-        if row:
-            return row[6]
-        else: 
-            Member.execute("""INSERT INTO Users (server_id, user_id, xp) VALUES (?, ?, ?)""",
-                            (guild.id, member.id, 0))
-            Data.commit()
-            return 0
+    async def getXpMember(guild: disnake.Guild, member: disnake.Member):
+        async with Data.users as users:
+            users.execute("SELECT * FROM Users WHERE server_id = ? AND user_id = ?", (guild.id, member.id))
+            row = users.fetchone()
+            if row:
+                return row[6]
+            else: 
+                users.execute("""INSERT INTO Users (server_id, user_id, xp) VALUES (?, ?, ?)""",
+                                          (guild.id, member.id, 0))
+                await users.commit()
+                return 0

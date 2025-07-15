@@ -32,7 +32,7 @@ class Profile(CogBase):
         name=member.display_name
         server = ctx.guild
 
-        voice_seconds = Member.getCountSecondVoice(member.guild.id, member.id)
+        voice_seconds = await Member.getCountSecondVoice(member.guild.id, member.id)
         
         if voice_seconds is None or voice_seconds == 0:
             days, hours, minutes, seconds = 0, 0, 0, 0
@@ -51,9 +51,9 @@ class Profile(CogBase):
         else:
             embed.add_field(name="<:Edit_fill:1281281277688942724> Статус", value=f"```Статус не установлен.```", inline=False)
         embed.add_field(name="<:Hourglass_fill:1281278042978910208> Активность", value=f"```{int(days)}д, {int(hours)}ч, {int(minutes)}м```", inline=False)
-        embed.add_field(name="<:Subtract1:1281279082537156618> Уровень", value=f"```{Member.getLevelMember(member.guild, member)}```", inline=True)
-        embed.add_field(name="<:Wallet_fill:1281280768919998535> Монеты", value=f"```{Balance.getBalance(member.guild.id, member.id)}```", inline=True)
-        embed.add_field(name="<:comment_fill:1281279319402090647> Сообщение", value=f"```{Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
+        embed.add_field(name="<:Subtract1:1281279082537156618> Уровень", value=f"```{await Member.getLevelMember(member.guild, member)}```", inline=True)
+        embed.add_field(name="<:Wallet_fill:1281280768919998535> Монеты", value=f"```{await Balance.getBalance(member.guild.id, member.id)}```", inline=True)
+        embed.add_field(name="<:comment_fill:1281279319402090647> Сообщение", value=f"```{await Member.getCountMessage(member.guild.id, member.id)}```", inline=True)
         embed.set_thumbnail(url=member.avatar)
         await ctx.send(embed=embed) 
         #               components=[
@@ -68,22 +68,22 @@ class Profile(CogBase):
     @commands.slash_command(description="Узнать баланс")
     @commands.default_member_permissions(administrator=True)
     async def balance(self, ctx):
-        await ctx.send(Balance.getBalance(ctx.guild.id, ctx.author.id))
+        await ctx.send(await Balance.getBalance(ctx.guild.id, ctx.author.id))
 
     @commands.slash_command(description="Добавить монеты")
     @commands.default_member_permissions(administrator=True)
     async def addbalance(self, ctx, member: disnake.Member = None, count: int = 0):
-        Balance.addBalance(ctx.guild.id, member.id, count)
+        await Balance.addBalance(ctx.guild.id, member.id, count)
 
     @commands.slash_command(description="Установить монеты")
     @commands.default_member_permissions(administrator=True)
     async def setbalance(self, ctx, member: disnake.Member = None, count: int = 0):
-        Balance.setBalance(ctx.guild.id, member.id, count)
+        await Balance.setBalance(ctx.guild.id, member.id, count)
 
     @commands.slash_command(description="Забрать монеты")
     @commands.default_member_permissions(administrator=True)
     async def spendbalance(self, ctx, member: disnake.Member = None, count: int = 0):
-        Balance.spendBalance(ctx.guild.id, member.id, count)
+        await Balance.spendBalance(ctx.guild.id, member.id, count)
 
     @commands.slash_command(description="")
     async def pay(self, ctx: ApplicationCommandInteraction, member: disnake.Member, count: int):
@@ -97,8 +97,8 @@ class Profile(CogBase):
             await ctx.send("У вас нету денег?", ephemeral=True)
             return
             
-        Balance.spendBalance(ctx.guild.id, ctx.author.id, count)
-        Balance.addBalance(ctx.guild.id, member.id, count)
+        await Balance.spendBalance(ctx.guild.id, ctx.author.id, count)
+        await Balance.addBalance(ctx.guild.id, member.id, count)
         await ctx.send(f"Вы успешно перевели деньги пользователю <@{member.id}> {count} монет!")
 
         embed = disnake.Embed(description=f"<@{ctx.author.id}> перевел <@{member.id}> `{count}` монет", timestamp=disnake.utils.utcnow())

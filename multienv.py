@@ -15,8 +15,8 @@ class EnvProvider:
         pass
 
     def setGlobal(self):
-        os.getEnv = self.get
-        os.env_provider = self
+        os.getEnv = self.get # type: ignore
+        os.env_provider = self # type: ignore
 
     def __format__(self, format_spec):
         parts = format_spec.split(":")
@@ -48,7 +48,7 @@ class IniEnvProvider(EnvProvider):
 
     def get(self, key : str, category : Optional[str] = "base") -> Optional[str]:
         try:
-            return self.config.get(category, key)
+            return self.config.get(category, key) # type: ignore
         except:
             return None
 
@@ -59,7 +59,7 @@ class CategoryDictEnvProvider(EnvProvider):
 
     def get(self, key: str, category: Optional[str] = "base") -> Optional[str]:
         try:
-            return self.data[category][key]
+            return self.data[category][key] # type: ignore
         except:
             return None
 
@@ -70,7 +70,7 @@ class DictEnvProvider(EnvProvider):
 
     def get(self, key: str, category: Optional[str] = "base") -> Optional[str]:
         try:
-            return self.data[category+key]
+            return self.data[category+key] # type: ignore
         except:
             return None
 
@@ -124,7 +124,7 @@ providers_pool = {
 
 class EnvMannager(EnvProvider):
     def __init__(self, providers : Optional[List[EnvProvider]] = []):
-        self.providers : List[EnvProvider] = providers
+        self.providers : List[EnvProvider] = providers # type: ignore
 
     def load(self) -> None:
         for p in self.providers:
@@ -147,7 +147,7 @@ class EnvMannager(EnvProvider):
             return provider
         if file is not None and type is not None:
             provider = providers_pool.get(type, IniEnvProvider)(file)
-            self.providers.append(provider)
+            self.providers.append(provider) # type: ignore
             return provider
         return None
 

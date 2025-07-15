@@ -63,3 +63,17 @@ def save_error_report(exception:Exception, additional_data:dict=None, report_fil
         pass
 
     return report_id
+
+def error_handler(func):
+    async def wrapper(*args, **kwargs):
+        try:
+            return await func(*args, **kwargs)
+        except Exception as e:
+            ctx = args[0] if isinstance(args[0], disnake.ApplicationCommandInteraction) else None
+            report = ErrorReport(e, additional_data=kwargs.get("additional_data", {}))
+            report()
+            if ctx:
+                await ctx.send(embed=report, ephemeral=True)
+            else:
+                print(f"Error in {func.__name__}: {e}")
+    return wrapper

@@ -1,7 +1,6 @@
 import copy
 import enum
 import disnake
-from disnake.ext import commands
 import random
 from util.db import Data
 import util.Resouces as res
@@ -12,7 +11,6 @@ import asyncio
 import re
 from util._init_ import Indelifer, CogBase
 from util.event import subscribe, OnMessage
-from typing import Union
 
 _failed_dm_users: set[int] = set()
 
@@ -25,6 +23,10 @@ async def can_send_dm(user: disnake.User) -> bool:
         await channel.send(content="\u200b", delete_after=0.1)
         return True
     except disnake.Forbidden:
+        _failed_dm_users.add(user.id)
+        Level.logger.info(str(_failed_dm_users))
+        return False
+    except disnake.HTTPException:
         _failed_dm_users.add(user.id)
         Level.logger.info(str(_failed_dm_users))
         return False
@@ -163,9 +165,6 @@ async def level_up(level: int, message: disnake.Message):
 
 @Indelifer("level")
 class Level(CogBase):
-    def init(self):
-        self.cur = Data.getCur()
-
     @subscribe(OnMessage)
     async def on_message(self, event : OnMessage):
         message = event.message
@@ -179,31 +178,32 @@ class Level(CogBase):
         return (min((len(message) + 1) // 10, 50) + random.randint(5, 15))
 
     async def add_xp(self, server_id : int, user_id : int, xp : int, msg : disnake.Message):
-        self.cur.execute("SELECT lvl, xp FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
-        result = self.cur.fetchone()
+        async with Data.users as users:
+            users.execute("SELECT lvl, xp FROM Users WHERE server_id = ? AND user_id = ?", (server_id, user_id))
+            result = users.fetchone()
 
-        if result:
-            current_level, current_xp = result
-            new_xp = current_xp + xp
-            xp_for_next_level = 150 * current_level
-
-            while new_xp >= xp_for_next_level:
-                new_xp -= xp_for_next_level
-                current_level += 1
-                await level_up(current_level, msg)
+            if result:
+                current_level, current_xp = result
+                new_xp = current_xp + xp
                 xp_for_next_level = 150 * current_level
 
-            if current_level == None:
-                return
-            self.cur.execute("""
-                UPDATE Users 
-                SET message = message + 1, xp = ?, lvl = ? 
-                WHERE server_id = ? AND user_id = ?
-            """, (new_xp, current_level, server_id, user_id))
-        else:
-            self.cur.execute("""
-                INSERT OR REPLACE INTO Users (server_id, user_id, message, xp, lvl)
-                VALUES (?, ?, 1, ?, 0)
-            """, (server_id, user_id, xp))
+                while new_xp >= xp_for_next_level:
+                    new_xp -= xp_for_next_level
+                    current_level += 1
+                    await level_up(current_level, msg)
+                    xp_for_next_level = 150 * current_level
 
-        Data.commit()
+                if current_level == None:
+                    return
+                users.execute("""
+                    UPDATE Users 
+                    SET message = message + 1, xp = ?, lvl = ? 
+                    WHERE server_id = ? AND user_id = ?
+                """, (new_xp, current_level, server_id, user_id))
+            else:
+                users.execute("""
+                    INSERT OR REPLACE INTO Users (server_id, user_id, message, xp, lvl)
+                    VALUES (?, ?, 1, ?, 0)
+                """, (server_id, user_id, xp))
+
+            await users.commit()

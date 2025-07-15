@@ -8,7 +8,7 @@ ProfileColor = settings.InvisibleColor
 
 @Indelifer("loveprofile")
 class LoveProfile(CogBase):
-    def init(self):
+    async def init(self):
         self.hesmap = {}
 
     @commands.slash_command()

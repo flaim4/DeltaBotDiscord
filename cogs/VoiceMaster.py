@@ -1,6 +1,5 @@
 import disnake
 from disnake.ext import commands
-from util.db import Data
 import time 
 import util.Resouces as res
 from disnake import TextInputStyle
@@ -32,8 +31,7 @@ class MyModal(disnake.ui.Modal):
 
 @Indelifer("voicemaster")
 class VoiceMaster(CogBase):
-    def init(self):
-        self.cur = Data.getCur()
+    async def init(self):
         self.heshmap = {}
         self.metadata = res.loadJsonObject("voicemaster")
 

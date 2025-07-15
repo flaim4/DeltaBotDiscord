@@ -10,7 +10,7 @@ from util._init_ import Indelifer, CogBase
 
 @Indelifer("shop")
 class Shop(CogBase):   
-    def init(self):
+    async def init(self):
         self.page = PageShop()
         self.manager = None
         self.server_id = None

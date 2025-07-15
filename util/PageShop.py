@@ -1,6 +1,6 @@
-from util.db import DBWapper, Data
+from util.db import Data
 
-class PageShop(DBWapper):
+class PageShop:
     def __init__(self):
         super().__init__()
         self.list = []

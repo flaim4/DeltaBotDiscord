@@ -3,7 +3,6 @@ from abc import ABC, abstractmethod
 import logging
 from util.event import bus
 from dataclasses import dataclass
-import asyncio
 
 def Indelifer(id: str):
     def decorator(obj):
@@ -16,12 +15,9 @@ class CogBase(Cog):
         self.bot : Bot = bot
         bot.add_cog(self)
         self.logger : logging.Logger = logging.getLogger(name)
-        self.init()
-        asyncio.run(bus.post(CogPostInit(self)))
-        self.logger.info("init")
         
     @abstractmethod
-    def init(self) -> None:
+    async def init(self) -> None:
         pass
     
 @dataclass

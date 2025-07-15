@@ -7,7 +7,7 @@ from util._init_ import Indelifer, CogBase
 
 @Indelifer("is_voice_time")
 class isVoiceTime(CogBase):  
-    def init(self):
+    async def init(self):
         self.heshmap = {}
 
     @commands.Cog.listener()
@@ -17,20 +17,19 @@ class isVoiceTime(CogBase):
 
         server_id = member.guild.id
 
-        cur = Data.getCur()
-        try:
+        async with Data.users as users:
             row = None
             
             if before.channel is None and after.channel is not None:
-                cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
-                row = cur.fetchone()
+                users.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
+                row = users.fetchone()
                 
                 if row is None:
-                    cur.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
+                    users.execute("""INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
                                 (server_id, member.id, 0))
-                    Data.commit()
-                    cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
-                    row = cur.fetchone()
+                    await users.commit()
+                    users.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id,))
+                    row = users.fetchone()
 
                 self.heshmap[member.id] = time.time()
 
@@ -40,21 +39,19 @@ class isVoiceTime(CogBase):
                     end_time = time.time()
 
                     if row is None:
-                        cur.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id))
-                        row = cur.fetchone()
+                        users.execute("""SELECT * FROM Users WHERE server_id = ? AND user_id = ?""", (server_id, member.id))
+                        row = users.fetchone()
 
                     if row:
                         voice_time = row[3] + (end_time - start_time)
-                        cur.execute("""UPDATE Users SET voice_activ=? WHERE server_id=? AND user_id=?""",
+                        users.execute("""UPDATE Users SET voice_activ=? WHERE server_id=? AND user_id=?""",
                                     (voice_time, server_id, member.id,))
-                        Data.commit()
+                        await users.commit()
 
                         hours_spent = int((end_time - start_time) // 3600)
                         if hours_spent > 0:
                             reward = hours_spent * 20
-                            Balance.addBalance(server_id, member.id, reward)
-        finally:
-            cur.close()
+                            await Balance.addBalance(server_id, member.id, reward)
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -66,38 +63,36 @@ class isVoiceTime(CogBase):
 
     @commands.slash_command(default_member_permissions=disnake.Permissions(administrator=True))
     async def sava_time_voice(self, ctx):
-        cur = Data.getCur()
         for guild in self.bot.guilds:
             for voice_channel in guild.voice_channels:
                 for member in voice_channel.members:
                     if not member.bot:
-                        start_time = self.heshmap.pop(member.id, time.time())
-                        end_time = time.time()
+                        async with Data.users as users:
+                            start_time = self.heshmap.pop(member.id, time.time())
+                            end_time = time.time()
 
-                        cur.execute(
-                            """SELECT voice_activ FROM Users WHERE server_id = ? AND user_id = ?""",
-                            (guild.id, member.id),
-                        )
-                        row = cur.fetchone()
-
-                        voice_time = (row[0] if row else 0) + (end_time - start_time)
-
-                        if row:
-                            cur.execute(
-                                """UPDATE Users SET voice_activ = ? WHERE server_id = ? AND user_id = ?""",
-                                (voice_time, guild.id, member.id),
+                            users.execute(
+                                """SELECT voice_activ FROM Users WHERE server_id = ? AND user_id = ?""",
+                                (guild.id, member.id),
                             )
-                        else:
-                            cur.execute(
-                                """INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
-                                (guild.id, member.id, voice_time),
-                            )
+                            row = users.fetchone()
 
-                        Data.commit()
+                            voice_time = (row[0] if row else 0) + (end_time - start_time)
 
-                        hours_spent = int((end_time - start_time) // 3600)
-                        if hours_spent > 0:
-                            reward = hours_spent * 20
-                            Balance.addBalance(guild.id, member.id, reward)
+                            if row:
+                                users.execute(
+                                    """UPDATE Users SET voice_activ = ? WHERE server_id = ? AND user_id = ?""",
+                                    (voice_time, guild.id, member.id),
+                                )
+                            else:
+                                users.execute(
+                                    """INSERT INTO Users (server_id, user_id, voice_activ) VALUES (?, ?, ?)""",
+                                    (guild.id, member.id, voice_time),
+                                )
 
-        cur.close()
+                            await users.commit()
+
+                            hours_spent = int((end_time - start_time) // 3600)
+                            if hours_spent > 0:
+                                reward = hours_spent * 20
+                                await Balance.addBalance(guild.id, member.id, reward)

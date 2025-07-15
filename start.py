@@ -20,14 +20,14 @@ async def main():
             bot_process = start_bot()
             print("Бот перезапущен.")
         
-        elif command == "exit":
+        elif command == "stop":
             print("Завершение работы.")
             bot_process.terminate()
             bot_process.wait()
             break
         
         else:
-            print("Неизвестная команда. Используйте 'reload' или 'exit'.")
+            print("Неизвестная команда. Используйте 'reload' или 'stop'.")
 
 if __name__ == "__main__":
     asyncio.run(main())
